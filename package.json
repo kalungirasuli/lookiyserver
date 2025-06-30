@@ -1,0 +1,23 @@
+{
+  "name": "lookiyserver",
+  "version": "1.0.0",
+  "description": "This an application server, the application is intended to work as a connect streamliner on events , oraganisations, schools and communities. Therefore being a quick and fast networking and connection merging and visaulation application. the server is to recommendation user with new connection the network(oragination) by the interest, ambition, bios posts. ",
+  "keywords": [
+    "lookiy"
+  ],
+  "homepage": "https://github.com/kalungirasuli/lookiyserver#readme",
+  "bugs": {
+    "url": "https://github.com/kalungirasuli/lookiyserver/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kalungirasuli/lookiyserver.git"
+  },
+  "license": "ISC",
+  "author": "kalungi rasuli",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
