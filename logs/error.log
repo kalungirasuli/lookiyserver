@@ -1,3 +1,0 @@
-{"timestamp":"2025-07-10T14:39:13.433Z","level":"error","message":"Registration failed","email":"kalungirasuli495@gmail.com","error":"relation \"users\" does not exist"}
-{"timestamp":"2025-07-10T14:47:50.981Z","level":"error","message":"Error creating database tables","error":"syntax error at or near \"PRIMARY\""}
-{"timestamp":"2025-07-10T14:50:17.229Z","level":"error","message":"Registration failed","email":"kalungirasuli495@gmail.com","error":"column \"isverified\" of relation \"users\" does not exist"}

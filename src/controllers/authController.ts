@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import sql from '../utils/db';
 import bcrypt from 'bcrypt';
-import { v4 as uuidv4 } from 'uuid';
 import { sendVerificationEmail } from '../utils/email';
 import { User } from '../models/user';
 import logger from '../utils/logger';
@@ -44,24 +43,25 @@ export async function register(
   const avatar = null;
 
   try {
-    await sql<User[]>`
+    const result = await sql<User[]>`
       INSERT INTO users (
-         name, email, password, description, interests, 
-        avatar, is_Verified, is_Public, createdAt, updatedAt
+        name, email, password, description, interests, 
+        avatar, isVerified, isPublic, createdAt, updatedAt
       ) VALUES (
         ${name}, ${email}, ${hashedPassword}, ${description || null}, 
         ${interests ? JSON.stringify(interests) : null}, ${avatar}, ${isVerified}, 
         ${typeof isPublic === 'boolean' ? isPublic : false}, ${createdAt}, ${updatedAt}
       )
+      RETURNING id
     `;
     
-    logger.info('User registered successfully', { userId: id, email });
+    const userId = result[0].id;
+    logger.info('User registered successfully', { userId, email });
     
-    const verificationToken = id;
-    await sendVerificationEmail(email, verificationToken);
-    logger.info('Verification email sent', { userId: id, email });
+    await sendVerificationEmail(email, userId);
+    logger.info('Verification email sent', { userId, email });
     
-    res.status(201).json({ message: 'User registered. Please verify your email.' });
+    res.status(201).json({ message: 'User registered. Please verify your email.'});
   } catch (err) {
     logger.error('Registration failed', { 
       email, 

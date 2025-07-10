@@ -3,27 +3,30 @@ import logger from './logger';
 
 export async function createTables() {
   try {
+    // Enable UUID extension
+    await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
+
     // Users table
     await sql`
       CREATE TABLE IF NOT EXISTS users (
-        id UUID PRIMARY KEY,
-        name VARCHAR(255) NOT NULL,
-        email VARCHAR(255) UNIQUE NOT NULL,
-        password VARCHAR(255) NOT NULL,
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        name TEXT NOT NULL,
+        email TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL,
         description TEXT,
-        interests JSONB,
-        avatar VARCHAR(255),
-        is_verified BOOLEAN DEFAULT FALSE,
-        is_public BOOLEAN DEFAULT FALSE,
-        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+        interests TEXT,
+        avatar TEXT,
+        isVerified BOOLEAN DEFAULT FALSE,
+        isPublic BOOLEAN DEFAULT FALSE,
+        createdAt TIMESTAMP DEFAULT now(),
+        updatedAt TIMESTAMP DEFAULT now()
       )
     `;
 
     // Networks table
     await sql`
       CREATE TABLE IF NOT EXISTS networks (
-        id UUID PRIMARY KEY,
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         name VARCHAR(255) NOT NULL,
         tag_name VARCHAR(255) UNIQUE NOT NULL,
         description TEXT,
@@ -37,7 +40,7 @@ export async function createTables() {
     // Network members and their roles
     await sql`
       CREATE TABLE IF NOT EXISTS network_members (
-        id UUID PRIMARY KEY,
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         network_id UUID REFERENCES networks(id) ON DELETE CASCADE,
         user_id UUID REFERENCES users(id) ON DELETE CASCADE,
         role VARCHAR(50) NOT NULL DEFAULT 'member',
@@ -49,7 +52,7 @@ export async function createTables() {
     // Connection requests
     await sql`
       CREATE TABLE IF NOT EXISTS connection_requests (
-        id UUID PRIMARY KEY,
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         from_user_id UUID REFERENCES users(id) ON DELETE CASCADE,
         to_user_id UUID REFERENCES users(id) ON DELETE CASCADE,
         status VARCHAR(50) DEFAULT 'pending',
@@ -62,7 +65,7 @@ export async function createTables() {
     // Connections (accepted connections)
     await sql`
       CREATE TABLE IF NOT EXISTS connections (
-        id UUID PRIMARY KEY,
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         user_id_1 UUID REFERENCES users(id) ON DELETE CASCADE,
         user_id_2 UUID REFERENCES users(id) ON DELETE CASCADE,
         connected_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -73,7 +76,7 @@ export async function createTables() {
     // Network posts
     await sql`
       CREATE TABLE IF NOT EXISTS posts (
-        id UUID PRIMARY KEY,
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         network_id UUID REFERENCES networks(id) ON DELETE CASCADE,
         user_id UUID REFERENCES users(id) ON DELETE CASCADE,
         content TEXT NOT NULL,
@@ -86,7 +89,7 @@ export async function createTables() {
     // Post comments
     await sql`
       CREATE TABLE IF NOT EXISTS comments (
-        id UUID PRIMARY KEY,
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         post_id UUID REFERENCES posts(id) ON DELETE CASCADE,
         user_id UUID REFERENCES users(id) ON DELETE CASCADE,
         content TEXT NOT NULL,
@@ -98,7 +101,7 @@ export async function createTables() {
     // Private messages
     await sql`
       CREATE TABLE IF NOT EXISTS messages (
-        id UUID PRIMARY KEY,
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         from_user_id UUID REFERENCES users(id) ON DELETE CASCADE,
         to_user_id UUID REFERENCES users(id) ON DELETE CASCADE,
         content TEXT NOT NULL,
@@ -110,7 +113,7 @@ export async function createTables() {
     // Connection blocking
     await sql`
       CREATE TABLE IF NOT EXISTS blocked_connections (
-        id UUID PRIMARY KEY,
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         blocker_id UUID REFERENCES users(id) ON DELETE CASCADE,
         blocked_id UUID REFERENCES users(id) ON DELETE CASCADE,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
