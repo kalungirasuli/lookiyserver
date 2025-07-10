@@ -1,0 +1,50 @@
+{
+  "name": "lookiyserver",
+  "version": "1.0.0",
+  "description": "This an application server, the application is intended to work as a connect streamliner on events , oraganisations, schools and communities. Therefore being a quick and fast networking and connection merging and visaulation application. the server is to recommendation user with new connection the network(oragination) by the interest, ambition, bios posts. ",
+  "keywords": [
+    "lookiy"
+  ],
+  "homepage": "https://github.com/kalungirasuli/lookiyserver#readme",
+  "bugs": {
+    "url": "https://github.com/kalungirasuli/lookiyserver/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kalungirasuli/lookiyserver.git"
+  },
+  "license": "ISC",
+  "author": "kalungi rasuli",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node dist/app.js",
+    "build": "tsc",
+    "prod": "npm run start",
+    "dev": "ts-node-dev --respawn --transpile-only ./src/app.ts"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/body-parser": "^1.19.6",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/morgan": "^1.9.10",
+    "@types/node": "^24.0.12",
+    "@types/uuid": "^10.0.0",
+    "@types/winston": "^2.4.4",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "ioredis": "^5.6.1",
+    "morgan": "^1.10.0",
+    "postgres": "^3.4.7",
+    "uuid": "^11.1.0",
+    "winston": "^3.17.0"
+  }
+}
