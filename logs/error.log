@@ -1,0 +1,10 @@
+{"timestamp":"2025-07-11T11:47:13.140Z","level":"error","message":"Registration failed","email":"kalungirasuli495@gmail.com","error":"duplicate key value violates unique constraint \"users_email_key\""}
+{"timestamp":"2025-07-11T12:12:45.099Z","level":"error","message":"Login failed","email":"xylophone.tec@gmail.com","error":"Cannot access 'ipAddress' before initialization"}
+{"timestamp":"2025-07-11T12:33:07.629Z","level":"error","message":"Login failed","email":"xylophone.tec@gmail.com","error":"Cannot access 'ipAddress' before initialization"}
+{"timestamp":"2025-07-11T12:35:04.852Z","level":"error","message":"Login failed","email":"xylophone.tec@gmail.com","error":"Cannot access 'ipAddress' before initialization"}
+{"timestamp":"2025-07-11T12:35:06.292Z","level":"error","message":"Login failed","email":"xylophone.tec@gmail.com","error":"Cannot access 'ipAddress' before initialization"}
+{"timestamp":"2025-07-11T12:35:07.270Z","level":"error","message":"Login failed","email":"xylophone.tec@gmail.com","error":"Cannot access 'ipAddress' before initialization"}
+{"timestamp":"2025-07-11T12:35:08.304Z","level":"error","message":"Login failed","email":"xylophone.tec@gmail.com","error":"Cannot access 'ipAddress' before initialization"}
+{"timestamp":"2025-07-11T12:35:09.080Z","level":"error","message":"Login failed","email":"xylophone.tec@gmail.com","error":"Cannot access 'ipAddress' before initialization"}
+{"timestamp":"2025-07-11T12:35:09.570Z","level":"error","message":"Login failed","email":"xylophone.tec@gmail.com","error":"Cannot access 'ipAddress' before initialization"}
+{"timestamp":"2025-07-11T12:35:11.048Z","level":"error","message":"Login failed","email":"xylophone.tec@gmail.com","error":"Cannot access 'ipAddress' before initialization"}

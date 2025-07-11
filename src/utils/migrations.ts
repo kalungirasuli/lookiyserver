@@ -121,6 +121,44 @@ export async function createTables() {
       )
     `;
 
+    // User sessions table for tracking login instances
+    await sql`
+      CREATE TABLE IF NOT EXISTS user_sessions (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+        device_id TEXT NOT NULL,
+        device_info JSONB,
+        ip_address TEXT,
+        is_active BOOLEAN DEFAULT TRUE,
+        last_active TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+        UNIQUE(user_id, device_id)
+      )
+    `;
+
+    // Login attempts tracking
+    await sql`
+      CREATE TABLE IF NOT EXISTS login_attempts (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+        ip_address TEXT NOT NULL,
+        attempted_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        is_successful BOOLEAN DEFAULT FALSE
+      )
+    `;
+
+    // Account suspensions
+    await sql`
+      CREATE TABLE IF NOT EXISTS account_suspensions (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+        reason TEXT NOT NULL,
+        suspended_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        expires_at TIMESTAMP WITH TIME ZONE NOT NULL
+      )
+    `;
+
     logger.info('All database tables created successfully');
   } catch (error) {
     logger.error('Error creating database tables', {
