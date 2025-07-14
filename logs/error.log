@@ -15,3 +15,18 @@
 {"timestamp":"2025-07-14T14:24:32.298Z","level":"error","message":"Account deletion request failed","userId":"4595a1fc-3146-4720-a5b7-061aabfec79e","error":"Unauthorized"}
 {"timestamp":"2025-07-14T14:31:25.061Z","level":"error","message":"Error creating database tables","error":""}
 {"timestamp":"2025-07-14T14:42:35.279Z","level":"error","message":"Account deletion request failed","userId":"a9c7f7c6-2f6e-4c7d-bc10-dbcdba27dff9","error":"Unauthorized"}
+{"timestamp":"2025-07-14T15:41:03.992Z","level":"error","message":"Account deletion request failed","userId":"aac3c789-c1dc-43b1-84ba-8130b9c0692b","error":"Unauthorized"}
+{"timestamp":"2025-07-14T15:52:03.513Z","level":"error","message":"Registration failed","email":"kalungirasuli495@gmail.com","error":""}
+{"timestamp":"2025-07-14T15:52:13.112Z","level":"error","message":"Error creating database tables","error":""}
+{"timestamp":"2025-07-14T15:52:18.277Z","level":"error","message":"Error creating database tables","error":""}
+{"timestamp":"2025-07-14T15:57:15.823Z","level":"error","message":"Account deletion request failed","userId":"d0283d30-1e89-4ea3-afae-21a7ca5033e7","error":"Unauthorized"}
+{"timestamp":"2025-07-14T16:12:21.955Z","level":"error","message":"Account deletion request failed","userId":"be2caef0-5f52-4efb-b32b-862a7dfc2052","error":"Unauthorized"}
+{"timestamp":"2025-07-14T16:27:46.557Z","level":"error","message":"Account deletion request failed","userId":"07fa885b-cfd6-4aa0-ad7c-1ac4a310e044","error":"Unauthorized"}
+{"timestamp":"2025-07-14T16:29:46.935Z","level":"error","message":"Registration failed","email":"kalungi@gmail.com","error":"relation \"users\" does not exist"}
+{"timestamp":"2025-07-14T16:30:04.387Z","level":"error","message":"Registration failed","email":"kalungi@gmail.com","error":"relation \"users\" does not exist"}
+{"timestamp":"2025-07-14T16:37:48.738Z","level":"error","message":"Account deletion request failed","userId":"a0cfcad0-16bd-483c-ba6a-8d29c78d0e72","error":"Unauthorized"}
+{"timestamp":"2025-07-14T16:55:28.063Z","level":"error","message":"Authentication error","error":""}
+{"timestamp":"2025-07-14T16:55:34.231Z","level":"error","message":"Authentication error","error":""}
+{"timestamp":"2025-07-14T16:55:35.576Z","level":"error","message":"Authentication error","error":""}
+{"timestamp":"2025-07-14T16:55:53.293Z","level":"error","message":"Database connection failed","error":""}
+{"timestamp":"2025-07-14T16:55:53.920Z","level":"error","message":"Error creating database tables","error":""}

@@ -514,20 +514,22 @@ export async function requestAccountDeletion(req: AuthRequest, res: Response) {
   if (!userId) {
     return res.status(401).json({ message: 'Authentication required' });
   }
-
+  console.log('Requesting account deletion for user:', {userId});
   try {
     const user = await sql<User[]>`
       SELECT * FROM users WHERE id = ${userId}
     `;
-
+    console.log('User found:', {message:"getting user by id"});
     if (user.length === 0) {
       return res.status(404).json({ message: 'User not found' });
+      console.log('User not found:', {message:"user not found"});
     }
 
     const now = new Date();
     const permanentDeletionDate = new Date(now.getTime() + 28 * 24 * 60 * 60 * 1000); // 28 days
+    console.log('Setting up account deletion:', {message:"setting up account deletion"});
     const recoveryToken = crypto.randomUUID();
-
+    console.log('Recovery token generated:', { recoveryToken });
     await sql.begin(async sql => {
       // Update user status
       await sql`
@@ -555,12 +557,13 @@ export async function requestAccountDeletion(req: AuthRequest, res: Response) {
         WHERE user_id = ${userId}
       `;
     });
-
-    await sendAccountDeletionEmail(user[0].email, recoveryToken);
-    
+    console.log('Account deletion record created:', {message:"account deletion record created"});
+    // await sendAccountDeletionEmail(user[0].email, recoveryToken);
+    console.log('Account deletion email sent:', {message:"account deletion email sent"});
     logger.info('Account deletion requested', { 
       userId,
-      permanentDeletionDate
+      permanentDeletionDate,
+      recoveryToken
     });
 
     res.json({ 
@@ -624,7 +627,7 @@ export async function recoverAccount(
       `;
     });
 
-    await sendAccountRecoveredEmail(deletionRecord.email);
+    // await sendAccountRecoveredEmail(deletionRecord.email);
 
     logger.info('Account recovered successfully', { 
       userId: deletionRecord.user_id 
