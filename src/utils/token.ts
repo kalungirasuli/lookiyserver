@@ -1,8 +1,9 @@
 import jwt from 'jsonwebtoken';
 import logger from './logger';
+import { decode } from 'punycode';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret';
-const TOKEN_EXPIRY = process.env.TOKEN_EXPIRY || '1d';
+const TOKEN_EXPIRY = '28 days'; // 28 days for account deletion recovery
 
 interface TokenPayload {
   userId: string;
@@ -25,6 +26,10 @@ export function generateToken(payload: TokenPayload): string {
 
 export function verifyToken(token: string): TokenPayload | null {
   try {
+    const result=jwt.decode(token) as TokenPayload;
+    const issuedAt = new Date(result.iat * 1000).toLocaleString();
+    const expiresAt = new Date(result.exp * 1000).toLocaleString();
+   
     return jwt.verify(token, JWT_SECRET) as TokenPayload;
   } catch (error) {
     logger.error('Token verification failed', {

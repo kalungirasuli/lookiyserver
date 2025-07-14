@@ -250,7 +250,6 @@ async function login(
     const userAgent = req.headers['user-agent'] || '';
     const parser = new UAParser();
     parser.setUA(userAgent);
-    
     const deviceInfo: DeviceInfo = {
       browser: parser.getBrowser(),
       os: parser.getOS(),
@@ -275,7 +274,7 @@ async function login(
     `;
 
     const sessionId = sessions[0].id;
-
+    console.log('sessionId', {sessionId});
     // Generate JWT with session info
     const token = generateToken({
       userId: user.id,
