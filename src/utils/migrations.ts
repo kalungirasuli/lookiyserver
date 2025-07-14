@@ -158,7 +158,49 @@ export async function createTables() {
         expires_at TIMESTAMP WITH TIME ZONE NOT NULL
       )
     `;
+    // Password reset tokens
+    await sql`
+    CREATE TABLE IF NOT EXISTS password_reset_tokens (
+      id SERIAL PRIMARY KEY,
+      user_id UUID REFERENCES users(id),
+      token UUID NOT NULL,
+      expires_at TIMESTAMP NOT NULL,
+      used BOOLEAN DEFAULT false,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+`;
+    await sql`
+     CREATE INDEX IF NOT EXISTS idx_password_reset_tokens_token ON password_reset_tokens(token);
+     `;
+     await sql`CREATE INDEX IF NOT EXISTS idx_password_reset_tokens_user_id ON password_reset_tokens(user_id);
+    `;
 
+    // Modify users table to add deletion status
+    await sql`
+      ALTER TABLE IF EXISTS users 
+      ADD COLUMN IF NOT EXISTS deletion_requested_at TIMESTAMP WITH TIME ZONE,
+      ADD COLUMN IF NOT EXISTS account_status VARCHAR(20) DEFAULT 'active'
+    `;
+
+    // Deleted accounts tracking
+    await sql`
+      CREATE TABLE IF NOT EXISTS deleted_accounts (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        user_id UUID REFERENCES users(id),
+        deletion_requested_at TIMESTAMP WITH TIME ZONE NOT NULL,
+        permanent_deletion_date TIMESTAMP WITH TIME ZONE NOT NULL,
+        recovery_token UUID,
+        reason TEXT,
+        is_permanent BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      )
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS idx_deleted_accounts_user_id ON deleted_accounts(user_id)
+      `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS idx_deleted_accounts_recovery_token ON deleted_accounts(recovery_token);
+    `;
     logger.info('All database tables created successfully');
   } catch (error) {
     logger.error('Error creating database tables', {

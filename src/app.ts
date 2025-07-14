@@ -6,6 +6,7 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import logger from './utils/logger'
 import { runMigrations } from './utils/migrations'
+import { startScheduledJobs } from './utils/scheduler'
 
 dotenv.config()
 
@@ -56,6 +57,7 @@ app.use('/V1/auth', auth)
 async function startServer() {
   try {
     await runMigrations()
+    startScheduledJobs() // Initialize scheduled jobs
     app.listen(port, () => {
       logger.info(`Server started and listening at http://localhost:${port}`)
     })

@@ -27,7 +27,7 @@ export async function sendVerificationEmail(email: string, token: string) {
       html: `<p>Click <a href="${verificationUrl}">here</a> to verify your email.</p>`
     });
     
-    logger.info('Verification email sent successfully', { to: email });
+    logger.info('Verification email sent successfully', { to: email ,token});
   } catch (error) {
     logger.error('Failed to send verification email', {
       to: email,
@@ -129,4 +129,64 @@ export async function sendAccountSuspensionEmail(
     });
     throw error;
   }
+}
+
+export async function sendPasswordResetEmail(email: string, resetToken: string) {
+  const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
+  
+  return sgMail.send({
+    to: email,
+    from: FROM_EMAIL,
+    subject: 'Password Reset Request',
+    html: `
+      <p>You requested a password reset. Click the link below to reset your password:</p>
+      <p><a href="${resetLink}">Reset Password</a></p>
+      <p>This link will expire in 5 minutes.</p>
+      <p>If you didn't request this, please ignore this email.</p>
+    `
+  });
+}
+
+export async function sendAccountDeletionEmail(email: string, recoveryToken: string) {
+  const recoveryLink = `${process.env.FRONTEND_URL}/recover-account?token=${recoveryToken}`;
+  
+  return sgMail.send({
+    to: email,
+    from: FROM_EMAIL,
+    subject: 'Account Deletion Requested',
+    html: `
+      <h2>Account Deletion Request Received</h2>
+      <p>Your account will be permanently deleted in 28 days. During this period, you can recover your account using the link below:</p>
+      <p><a href="${recoveryLink}" style="background: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Recover Account</a></p>
+      <p>If you do not recover your account within 28 days, all your data will be permanently flagged as deleted but retained for recordkeeping purposes.</p>
+      <p>If you did not request this deletion, please recover your account immediately and change your password.</p>
+    `
+  });
+}
+
+export async function sendAccountRecoveredEmail(email: string) {
+  return sgMail.send({
+    to: email,
+    from: FROM_EMAIL,
+    subject: 'Account Recovered Successfully',
+    html: `
+      <h2>Account Recovery Successful</h2>
+      <p>Your account has been successfully recovered and is now active again.</p>
+      <p>If you did not initiate this recovery, please contact our support team immediately.</p>
+    `
+  });
+}
+
+export async function sendPermanentDeletionEmail(email: string) {
+  return sgMail.send({
+    to: email,
+    from: FROM_EMAIL,
+    subject: 'Account Permanently Deleted',
+    html: `
+      <h2>Account Permanently Deleted</h2>
+      <p>Your account has been permanently deleted as per your request.</p>
+      <p>While your personal identifiers have been removed, some data may be retained for recordkeeping purposes.</p>
+      <p>Thank you for having been part of our community.</p>
+    `
+  });
 }

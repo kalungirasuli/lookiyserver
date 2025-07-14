@@ -1,10 +1,12 @@
-{"timestamp":"2025-07-11T11:47:13.140Z","level":"error","message":"Registration failed","email":"kalungirasuli495@gmail.com","error":"duplicate key value violates unique constraint \"users_email_key\""}
-{"timestamp":"2025-07-11T12:12:45.099Z","level":"error","message":"Login failed","email":"xylophone.tec@gmail.com","error":"Cannot access 'ipAddress' before initialization"}
-{"timestamp":"2025-07-11T12:33:07.629Z","level":"error","message":"Login failed","email":"xylophone.tec@gmail.com","error":"Cannot access 'ipAddress' before initialization"}
-{"timestamp":"2025-07-11T12:35:04.852Z","level":"error","message":"Login failed","email":"xylophone.tec@gmail.com","error":"Cannot access 'ipAddress' before initialization"}
-{"timestamp":"2025-07-11T12:35:06.292Z","level":"error","message":"Login failed","email":"xylophone.tec@gmail.com","error":"Cannot access 'ipAddress' before initialization"}
-{"timestamp":"2025-07-11T12:35:07.270Z","level":"error","message":"Login failed","email":"xylophone.tec@gmail.com","error":"Cannot access 'ipAddress' before initialization"}
-{"timestamp":"2025-07-11T12:35:08.304Z","level":"error","message":"Login failed","email":"xylophone.tec@gmail.com","error":"Cannot access 'ipAddress' before initialization"}
-{"timestamp":"2025-07-11T12:35:09.080Z","level":"error","message":"Login failed","email":"xylophone.tec@gmail.com","error":"Cannot access 'ipAddress' before initialization"}
-{"timestamp":"2025-07-11T12:35:09.570Z","level":"error","message":"Login failed","email":"xylophone.tec@gmail.com","error":"Cannot access 'ipAddress' before initialization"}
-{"timestamp":"2025-07-11T12:35:11.048Z","level":"error","message":"Login failed","email":"xylophone.tec@gmail.com","error":"Cannot access 'ipAddress' before initialization"}
+{"timestamp":"2025-07-14T09:24:13.007Z","level":"error","message":"Error creating database tables","error":"cannot insert multiple commands into a prepared statement"}
+{"timestamp":"2025-07-14T09:24:53.542Z","level":"error","message":"Error creating database tables","error":"cannot insert multiple commands into a prepared statement"}
+{"timestamp":"2025-07-14T09:25:49.986Z","level":"error","message":"Error creating database tables","error":"cannot insert multiple commands into a prepared statement"}
+{"timestamp":"2025-07-14T10:04:07.620Z","level":"error","message":"Error creating database tables","error":"cannot insert multiple commands into a prepared statement"}
+{"timestamp":"2025-07-14T10:04:09.534Z","level":"error","message":"Error creating database tables","error":"cannot insert multiple commands into a prepared statement"}
+{"timestamp":"2025-07-14T10:04:11.351Z","level":"error","message":"Error creating database tables","error":"syntax error at or near \"aw\""}
+{"timestamp":"2025-07-14T10:04:11.667Z","level":"error","message":"Error creating database tables","error":"syntax error at or near \"awq\""}
+{"timestamp":"2025-07-14T12:04:02.953Z","level":"error","message":"Database connection failed","error":"database \"lookiy\" does not exist"}
+{"timestamp":"2025-07-14T12:28:25.887Z","level":"error","message":"Registration failed","email":"kalungirasuli495@gmail.com","error":"duplicate key value violates unique constraint \"users_email_key\""}
+{"timestamp":"2025-07-14T13:04:44.658Z","level":"error","message":"Registration failed","email":"kalungirasuli495@gmail.com","error":"duplicate key value violates unique constraint \"users_email_key\""}
+{"timestamp":"2025-07-14T13:58:22.469Z","level":"error","message":"Account deletion request failed","userId":"58d14cd6-e783-4a45-80e6-9c027d2ab817","error":"Cannot read properties of undefined (reading 'reason')"}
+{"timestamp":"2025-07-14T14:02:20.312Z","level":"error","message":"Account deletion request failed","userId":"58d14cd6-e783-4a45-80e6-9c027d2ab817","error":"Unauthorized"}

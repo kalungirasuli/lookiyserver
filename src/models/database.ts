@@ -11,8 +11,20 @@ export interface User extends BaseModel {
   description?: string;
   interests?: string[];
   avatar?: string;
-  isVerified: boolean;
+  isverified: boolean;
   isPublic: boolean;
+  deletion_requested_at?: Date;
+  account_status: 'active' | 'deleted' | 'pending_deletion';
+}
+
+export interface DeletedAccount extends BaseModel {
+  user_id: string;
+  deletion_requested_at: Date;
+  permanent_deletion_date: Date;
+  recovery_token: string;
+  reason?: string;
+  is_permanent: boolean;
+  email?: string; // Added for join queries
 }
 
 export interface Network extends BaseModel {
