@@ -9,6 +9,7 @@ import { AuthResponse, DeviceInfo, LoginResponse, } from '../types/auth';
 import { AuthRequest } from '../middleware/auth';
 import { generateToken, verifyToken } from '../utils/token';
 import { uploadToGCS } from '../utils/storage';
+import { generateAndUploadAvatar } from '../utils/avatar';
 
 interface RegisterRequestBody {
   name: string;
@@ -45,22 +46,39 @@ export async function register(
   const createdAt = new Date();
   const updatedAt = new Date();
   const isVerified = false;
-  const avatar = null;
 
   try {
+    // First create the user to get the ID
     const result = await sql<User[]>`
       INSERT INTO users (
         name, email, password, description, interests, 
-        avatar, isVerified, isPublic, createdAt, updatedAt
+        isVerified, isPublic, createdAt, updatedAt
       ) VALUES (
         ${name}, ${email}, ${hashedPassword}, ${description || null}, 
-        ${interests ? JSON.stringify(interests) : null}, ${avatar}, ${isVerified}, 
+        ${interests ? JSON.stringify(interests) : null}, ${isVerified}, 
         ${typeof isPublic === 'boolean' ? isPublic : false}, ${createdAt}, ${updatedAt}
       )
       RETURNING id
     `;
     
     const userId = result[0].id;
+
+    // Generate and upload default avatar
+    try {
+      const avatarUrl = await generateAndUploadAvatar(userId);
+      await sql`
+        UPDATE users
+        SET avatar = ${avatarUrl}
+        WHERE id = ${userId}
+      `;
+    } catch (avatarError) {
+      logger.error('Failed to generate avatar', {
+        userId,
+        error: avatarError instanceof Error ? avatarError.message : 'Unknown error'
+      });
+      // Continue registration even if avatar generation fails
+    }
+    
     logger.info('User registered successfully', { userId, email });
     
     await sendVerificationEmail(email, userId);
