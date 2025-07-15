@@ -8,9 +8,11 @@ import {
   requestPasswordReset,
   resetPassword,
   requestAccountDeletion,
-  recoverAccount
+  recoverAccount,
+  editProfile
 } from '../controllers/authController';
 import { authenticate } from '../middleware/auth';
+import { avatarUpload } from '../utils/storage';
 
 const router = Router();
 
@@ -23,5 +25,6 @@ router.post('/forgot-password', requestPasswordReset);
 router.post('/reset-password', resetPassword);
 router.post('/delete-account', authenticate, requestAccountDeletion);
 router.post('/recover-account', recoverAccount);
+router.put('/profile', authenticate, avatarUpload, editProfile);
 
 export default router;

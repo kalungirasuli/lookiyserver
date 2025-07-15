@@ -8,6 +8,7 @@ import { UAParser } from 'ua-parser-js';
 import { AuthResponse, DeviceInfo, LoginResponse, } from '../types/auth';
 import { AuthRequest } from '../middleware/auth';
 import { generateToken, verifyToken } from '../utils/token';
+import { uploadToGCS } from '../utils/storage';
 
 interface RegisterRequestBody {
   name: string;
@@ -739,5 +740,145 @@ export async function loginCheck(
       error: err instanceof Error ? err.message : 'Unknown error'
     });
     return res.status(500).json({ message: 'Login failed' });
+  }
+}
+
+interface EditProfileRequestBody {
+  name?: string;
+  description?: string;
+  interests?: string[];
+  isPublic?: boolean;
+  avatar?: string;
+  email?: string; 
+}
+
+export async function editProfile(
+  req: AuthRequest,
+  res: Response
+) {
+  console.log('Starting editProfile with request:', {
+    body: req.body,
+    file: req.file,
+    userId: req.user?.id
+  });
+
+  const userId = req.user?.id;
+  if (!userId) {
+    console.log('Authentication failed - no userId found');
+    return res.status(401).json({ message: 'Authentication required' });
+  }
+
+  try {
+    console.log('Fetching user from database:', { userId });
+    // Verify user exists
+    const users = await sql<User[]>`
+      SELECT * FROM users WHERE id = ${userId}
+    `;
+
+    if (users.length === 0) {
+      console.log('User not found in database:', { userId });
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const updates = [];
+    const { name, description, interests, isPublic, email } = req.body?req.body:{};
+    console.log('Processing update fields:', { name, description, interests, isPublic, email });
+    
+    // Handle file upload if present
+    let avatarUrl: string | undefined;
+    if (req.file) {
+      console.log('Processing file upload:', { 
+        originalName: req.file.originalname,
+        size: req.file.size,
+        mimetype: req.file.mimetype 
+      })
+      ;
+      try {
+        avatarUrl = await uploadToGCS(req.file);
+        console.log('File upload successful:', { avatarUrl });
+      } catch (error) {
+        console.error('Avatar upload failed:', error);
+        logger.error('Avatar upload failed', {
+          userId,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        });
+        return res.status(500).json({ message: 'Failed to upload avatar' });
+      }
+    }
+    else {
+      console.log('No file uploaded, skipping avatar update');
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    if (name !== undefined) {
+      console.log('Adding name update:', { name });
+      updates.push(sql`"name" = ${name}`);
+    }
+    if (email !== undefined) {
+      console.log('Adding email update:', { email });
+      updates.push(sql`"email" = ${email}`);
+    }
+    if (description !== undefined) {
+      console.log('Adding description update:', { description });
+      updates.push(sql`"description" = ${description}`);
+    }
+    if (interests !== undefined) {
+      console.log('Adding interests update:', { interests });
+      updates.push(sql`"interests" = ${JSON.stringify(interests)}`);
+    }
+    if (isPublic !== undefined) {
+      console.log('Adding isPublic update:', { isPublic });
+      updates.push(sql`"ispublic" = ${isPublic}`);
+    }
+    if (avatarUrl !== undefined) {
+      console.log('Adding avatar update:', { avatarUrl });
+      updates.push(sql`"avatar" = ${avatarUrl}`);
+    }
+
+    // Always update updatedAt
+    updates.push(sql`"updatedat" = NOW()`);
+
+    if (updates.length === 0) {
+      console.log('No fields to update');
+      return res.status(400).json({ message: 'No fields to update' });
+    }
+
+    console.log('Preparing SQL update with fields:', { updateCount: updates.length });
+    // Combine all updates with commas
+    const updateClause = updates.reduce((acc, curr) => sql`${acc}, ${curr}`);
+
+    console.log('Executing database update');
+    const result = await sql<User[]>`
+      UPDATE users
+      SET ${updateClause}
+      WHERE id = ${userId}
+      RETURNING *
+    `;
+
+    console.log('Database update successful:', { 
+      updatedFields: Object.keys(req.body),
+      hasAvatar: !!avatarUrl 
+    });
+
+    logger.info('Profile updated successfully', { 
+      userId,
+      updatedFields: Object.keys(req.body),
+      hasAvatar: !!avatarUrl
+    });
+
+    // Return updated user data (excluding sensitive fields)
+    const { password, ...updatedUser } = result[0];
+    console.log('Sending response with updated user data');
+    res.json({ 
+      message: 'Profile updated successfully',
+      user: updatedUser
+    });
+  } catch (err) {
+    console.error('Profile update failed:', err);
+    logger.error('Profile update failed', {
+      userId,
+      error: err instanceof Error ? err.message : 'Unknown error'
+    });
+    res.status(500).json({ message: 'Failed to update profile' });
   }
 }

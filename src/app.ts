@@ -49,7 +49,7 @@ app.use(cors({
 
 app.get('/', (req: Request, res: Response) => {
   logger.info('Health check endpoint accessed')
-  res.send('Hello World!')
+  res.send('Am a live 👌🏾...')
 })
 
 app.use('/V1/auth', auth)
