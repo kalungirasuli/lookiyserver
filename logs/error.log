@@ -1,0 +1,5 @@
+{"timestamp":"2025-07-16T07:41:29.214Z","level":"error","message":"Error creating database tables","error":""}
+{"timestamp":"2025-07-16T13:32:08.963Z","level":"error","message":"Token verification failed","error":"Cannot read properties of null (reading 'iat')"}
+{"timestamp":"2025-07-16T13:38:38.300Z","level":"error","message":"Failed to generate network avatar","networkId":"5df466e8-9e00-4e44-94ca-814c2e088b49","error":"column \"avatar\" of relation \"networks\" does not exist"}
+{"timestamp":"2025-07-16T13:38:38.304Z","level":"error","message":"Network creation failed","error":"column \"avatar\" of relation \"networks\" does not exist","title":"Lookiy offical","creatorId":"478d8246-2b31-46af-8108-ece901b0cc3f"}
+{"timestamp":"2025-07-16T13:47:42.662Z","level":"error","message":"Registration failed","email":"kalungi@gmail.com","error":"relation \"users\" does not exist"}

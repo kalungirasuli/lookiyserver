@@ -32,6 +32,7 @@ export async function createTables() {
         description TEXT,
         is_private BOOLEAN DEFAULT FALSE,
         passcode VARCHAR(255),
+        avatar TEXT,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       )

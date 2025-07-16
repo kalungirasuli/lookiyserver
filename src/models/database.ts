@@ -33,6 +33,7 @@ export interface Network extends BaseModel {
   description?: string;
   is_private: boolean;
   passcode?: string;
+  avatar?: string;
 }
 
 export interface NetworkMember extends BaseModel {

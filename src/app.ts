@@ -1,5 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express'
 import auth from './routes/auth'
+import networks from './routes/networks'
 import bodyParser from 'body-parser'
 import process from 'process'
 import cors from 'cors'
@@ -53,6 +54,7 @@ app.get('/', (req: Request, res: Response) => {
 })
 
 app.use('/V1/auth', auth)
+app.use('/V1/networks', networks)
 
 async function startServer() {
   try {
