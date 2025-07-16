@@ -30,9 +30,12 @@ export async function createNetwork(
     return res.status(400).json({ message: 'Title and type are required' });
   }
 
-  // Validate passcode for private networks
+  // Validate passcode requirements
   if (type === 'private' && !passcode) {
     return res.status(400).json({ message: 'Passcode is required for private networks' });
+  }
+  if (type === 'public' && passcode) {
+    return res.status(400).json({ message: 'Public networks cannot have passcodes' });
   }
 
   try {
@@ -180,6 +183,7 @@ interface EditNetworkBody {
   name?: string;
   description?: string;
   passcode?: string;
+  isPrivate?: boolean;
 }
 
 export async function editNetwork(
@@ -197,7 +201,7 @@ export async function editNetwork(
   try {
     // Check if network exists and user is an admin
     const members = await sql<NetworkMember[]>`
-      SELECT nm.* 
+      SELECT nm.*, n.is_private 
       FROM network_members nm
       JOIN networks n ON n.id = nm.network_id
       WHERE nm.network_id = ${id}
@@ -208,6 +212,12 @@ export async function editNetwork(
     if (members.length === 0) {
       return res.status(403).json({ message: 'Only network admins can edit network details' });
     }
+
+    // Get current network state
+    const networks = await sql<Network[]>`
+      SELECT * FROM networks WHERE id = ${id}
+    `;
+    const network = networks[0];
 
     // Handle file upload if present
     let avatarUrl: string | undefined;
@@ -231,9 +241,34 @@ export async function editNetwork(
     if (updates.description !== undefined) {
       updateFields.push(sql`description = ${updates.description}`);
     }
+
+    // Handle privacy changes
+    if (updates.isPrivate !== undefined) {
+      // If switching to private, require a passcode
+      if (updates.isPrivate && !updates.passcode && !network.passcode) {
+        return res.status(400).json({ 
+          message: 'A passcode is required when making a network private' 
+        });
+      }
+      updateFields.push(sql`is_private = ${updates.isPrivate}`);
+      
+      // Clear passcode if switching to public
+      if (!updates.isPrivate) {
+        updateFields.push(sql`passcode = NULL`);
+      }
+    }
+
+    // Update passcode only if provided and network is/will be private
     if (updates.passcode !== undefined) {
+      const willBePrivate = updates.isPrivate ?? network.is_private;
+      if (!willBePrivate) {
+        return res.status(400).json({ 
+          message: 'Cannot set passcode for public networks' 
+        });
+      }
       updateFields.push(sql`passcode = ${updates.passcode}`);
     }
+
     if (avatarUrl) {
       updateFields.push(sql`avatar = ${avatarUrl}`);
     }
@@ -257,7 +292,8 @@ export async function editNetwork(
     logger.info('Network updated successfully', {
       networkId: id,
       updatedBy: userId,
-      updatedFields: Object.keys(updates)
+      updatedFields: Object.keys(updates),
+      privacyChanged: updates.isPrivate !== undefined
     });
 
     res.json({
