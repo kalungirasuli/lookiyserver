@@ -26,15 +26,26 @@ async function getDefaultLogo(): Promise<Buffer> {
   }
 }
 
+function formatDeepLink(url: string): string {
+  if (!url.includes('://')) {
+    // If it's not already a URL scheme, assume it's a web URL
+    return `https://${url.replace(/^[/]*/, '')}`;
+  }
+  return url;
+}
+
 export async function generateCustomQR(
   data: string,
   logoBuffer?: Buffer | 'default' | null,
   options: QROptions = {}
 ): Promise<Buffer> {
+  // Format the URL for deep linking
+  const formattedData = formatDeepLink(data);
+  
   // Default options
   const {
     size = 400,
-    dotScale = 0.4,
+    dotScale = 0.8, // increased from 0.4 to 0.8
     frameColor = '#FF6B35',
     frameWidth = 8,
     frameRadius = 15,
@@ -45,8 +56,8 @@ export async function generateCustomQR(
   } = options;
 
   // Input validation
-  if (!data) throw new Error('Data is required');
-  if (data.length > 2953) throw new Error('Data too long for QR code');
+  if (!formattedData) throw new Error('Data is required');
+  if (formattedData.length > 2953) throw new Error('Data too long for QR code');
 
   // Handle logo buffer
   let finalLogoBuffer: Buffer | undefined;
@@ -60,8 +71,8 @@ export async function generateCustomQR(
   const canvas = createCanvas(size, size);
   const ctx = canvas.getContext('2d');
 
-  // Generate QR code
-  const qrData = await QRCode.create(data, {
+  // Generate QR code with the formatted URL
+  const qrData = await QRCode.create(formattedData, {
     errorCorrectionLevel: 'H',
     margin: 0
   });
@@ -96,19 +107,16 @@ function drawFrame(
   radius: number,
   color: string
 ): void {
-  ctx.strokeStyle = color;
-  ctx.lineWidth = frameWidth;
-  ctx.beginPath();
-  ctx.moveTo(radius, 0);
-  ctx.lineTo(size - radius, 0);
-  ctx.arcTo(size, 0, size, radius, radius);
-  ctx.lineTo(size, size - radius);
-  ctx.arcTo(size, size, size - radius, size, radius);
-  ctx.lineTo(radius, size);
-  ctx.arcTo(0, size, 0, size - radius, radius);
-  ctx.lineTo(0, radius);
-  ctx.arcTo(0, 0, radius, 0, radius);
-  ctx.stroke();
+  ctx.fillStyle = color;
+  
+  // Top border
+  ctx.fillRect(0, 0, size, frameWidth);
+  // Bottom border
+  ctx.fillRect(0, size - frameWidth, size, frameWidth);
+  // Left border
+  ctx.fillRect(0, 0, frameWidth, size);
+  // Right border
+  ctx.fillRect(size - frameWidth, 0, frameWidth, size);
 }
 
 async function drawQRDots(
@@ -126,10 +134,7 @@ async function drawQRDots(
       if (qrData.modules.get(row, col)) {
         const x = offset + (col * moduleSize) + (moduleSize - dotSize) / 2;
         const y = offset + (row * moduleSize) + (moduleSize - dotSize) / 2;
-        
-        ctx.beginPath();
-        ctx.arc(x + dotSize/2, y + dotSize/2, dotSize/2, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.fillRect(x, y, dotSize, dotSize);
       }
     }
   }

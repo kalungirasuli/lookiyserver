@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
 import { AuthRequest } from '../middleware/auth';
 import sql from '../utils/db';
-import { Network } from '../models/database';
+import { Network, NetworkMember } from '../models/database';
 import { generateAndUploadAvatar } from '../utils/avatar';
 import { generateCustomQR } from '../utils/qrGenerator';
+import { uploadToGCS } from '../utils/storage';
 import logger from '../utils/logger';
 import crypto from 'crypto';
 
@@ -172,5 +173,102 @@ export async function getShareableLink(req: Request, res: Response) {
       networkId: id
     });
     res.status(500).json({ message: 'Failed to generate shareable link' });
+  }
+}
+
+interface EditNetworkBody {
+  name?: string;
+  description?: string;
+  passcode?: string;
+}
+
+export async function editNetwork(
+  req: AuthRequest,
+  res: Response
+) {
+  const { id } = req.params;
+  const userId = req.user?.id;
+  const updates = req.body as EditNetworkBody;
+
+  if (!userId) {
+    return res.status(401).json({ message: 'Authentication required' });
+  }
+
+  try {
+    // Check if network exists and user is an admin
+    const members = await sql<NetworkMember[]>`
+      SELECT nm.* 
+      FROM network_members nm
+      JOIN networks n ON n.id = nm.network_id
+      WHERE nm.network_id = ${id}
+        AND nm.user_id = ${userId}
+        AND nm.role = 'admin'
+    `;
+
+    if (members.length === 0) {
+      return res.status(403).json({ message: 'Only network admins can edit network details' });
+    }
+
+    // Handle file upload if present
+    let avatarUrl: string | undefined;
+    if (req.file) {
+      try {
+        avatarUrl = await uploadToGCS(req.file);
+      } catch (error) {
+        logger.error('Network avatar upload failed', {
+          networkId: id,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        });
+        return res.status(500).json({ message: 'Failed to upload network avatar' });
+      }
+    }
+
+    // Build update query
+    const updateFields = [];
+    if (updates.name !== undefined) {
+      updateFields.push(sql`name = ${updates.name}`);
+    }
+    if (updates.description !== undefined) {
+      updateFields.push(sql`description = ${updates.description}`);
+    }
+    if (updates.passcode !== undefined) {
+      updateFields.push(sql`passcode = ${updates.passcode}`);
+    }
+    if (avatarUrl) {
+      updateFields.push(sql`avatar = ${avatarUrl}`);
+    }
+    updateFields.push(sql`updated_at = NOW()`);
+
+    if (updateFields.length === 0) {
+      return res.status(400).json({ message: 'No fields to update' });
+    }
+
+    // Combine all updates with commas
+    const updateClause = updateFields.reduce((acc, curr) => sql`${acc}, ${curr}`);
+
+    // Execute update
+    const result = await sql<Network[]>`
+      UPDATE networks
+      SET ${updateClause}
+      WHERE id = ${id}
+      RETURNING *
+    `;
+
+    logger.info('Network updated successfully', {
+      networkId: id,
+      updatedBy: userId,
+      updatedFields: Object.keys(updates)
+    });
+
+    res.json({
+      message: 'Network updated successfully',
+      network: result[0]
+    });
+  } catch (error) {
+    logger.error('Network update failed', {
+      networkId: id,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+    res.status(500).json({ message: 'Failed to update network' });
   }
 }

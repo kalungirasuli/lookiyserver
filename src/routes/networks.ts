@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { authenticate } from '../middleware/auth';
-import { createNetwork, generateNetworkQR, getShareableLink } from '../controllers/networkController';
+import { createNetwork, generateNetworkQR, getShareableLink, editNetwork } from '../controllers/networkController';
+import { avatarUpload } from '../utils/storage';
 
 const router = Router();
 
@@ -11,6 +12,9 @@ router.post('/', authenticate, createNetwork);
 router.get('/:id/qr', generateNetworkQR);
 
 // Get shareable link
-router.get('/:id/share',getShareableLink);
+router.get('/:id/share', getShareableLink);
+
+// Edit network
+router.put('/:id', authenticate, avatarUpload, editNetwork);
 
 export default router;
