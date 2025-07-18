@@ -33,8 +33,10 @@ export async function createTables() {
         is_private BOOLEAN DEFAULT FALSE,
         passcode VARCHAR(255),
         avatar TEXT,
+        approval_mode VARCHAR(50) NOT NULL DEFAULT 'manual',
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        last_passcode_update TIMESTAMP WITH TIME ZONE
       )
     `;
 
@@ -202,6 +204,67 @@ export async function createTables() {
     await sql`
       CREATE INDEX IF NOT EXISTS idx_deleted_accounts_recovery_token ON deleted_accounts(recovery_token);
     `;
+
+    // Pending network join requests
+    await sql`
+      CREATE TABLE IF NOT EXISTS pending_network_joins (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        network_id UUID REFERENCES networks(id) ON DELETE CASCADE,
+        user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+        status VARCHAR(20) DEFAULT 'pending',
+        passcode_attempt TEXT,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(network_id, user_id)
+      )
+    `;
+
+    // Network invitations
+    await sql`
+      CREATE TABLE IF NOT EXISTS network_invitations (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        network_id UUID REFERENCES networks(id) ON DELETE CASCADE,
+        invited_user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+        invited_by_id UUID REFERENCES users(id) ON DELETE CASCADE,
+        role VARCHAR(50) NOT NULL DEFAULT 'member',
+        invite_token UUID NOT NULL,
+        is_used BOOLEAN DEFAULT FALSE,
+        expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(network_id, invited_user_id, invite_token)
+      )
+    `;
+
+    await sql`
+      CREATE INDEX IF NOT EXISTS idx_network_invitations_token ON network_invitations(invite_token)
+    `;
+
+    // Network goals
+    await sql`
+      CREATE TABLE IF NOT EXISTS network_goals (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        network_id UUID REFERENCES networks(id) ON DELETE CASCADE,
+        title VARCHAR(255) NOT NULL,
+        description TEXT,
+        created_by_id UUID REFERENCES users(id),
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      )
+    `;
+
+    // User selected goals in network
+    await sql`
+      CREATE TABLE IF NOT EXISTS user_network_goals (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+        network_id UUID REFERENCES networks(id) ON DELETE CASCADE,
+        goal_id UUID REFERENCES network_goals(id) ON DELETE CASCADE,
+        selected_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id, network_id, goal_id)
+      )
+    `;
+
+   
+
     logger.info('All database tables created successfully');
   } catch (error) {
     logger.error('Error creating database tables', {

@@ -34,6 +34,8 @@ export interface Network extends BaseModel {
   is_private: boolean;
   passcode?: string;
   avatar?: string;
+  approval_mode: 'manual' | 'passcode' | 'auto';
+  last_passcode_update?: Date;
 }
 
 export interface NetworkMember extends BaseModel {
@@ -102,4 +104,35 @@ export interface AccountSuspension extends BaseModel {
   reason: string;
   suspended_at: Date;
   expires_at: Date;
+}
+
+export interface NetworkInvitation extends BaseModel {
+  network_id: string;
+  invited_user_id: string;
+  invited_by_id: string;
+  role: 'admin' | 'leader' | 'vip' | 'moderator' | 'member';
+  invite_token: string;
+  is_used: boolean;
+  expires_at: Date;
+}
+
+export interface NetworkGoal extends BaseModel {
+  network_id: string;
+  title: string;
+  description?: string;
+  created_by_id: string;
+}
+
+export interface UserNetworkGoal extends BaseModel {
+  user_id: string;
+  network_id: string;
+  goal_id: string;
+  selected_at: Date;
+}
+
+export interface PendingNetworkJoin extends BaseModel {
+  network_id: string;
+  user_id: string;
+  status: 'pending' | 'approved' | 'rejected';
+  passcode_attempt?: string;
 }
