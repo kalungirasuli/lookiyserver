@@ -10,6 +10,26 @@ import { AuthRequest } from '../middleware/auth';
 import { generateToken, verifyToken } from '../utils/token';
 import { uploadToGCS } from '../utils/storage';
 import { generateAndUploadAvatar } from '../utils/avatar';
+import { cacheGet, cacheSet, cacheDelete } from '../utils/redis';
+import { kafkaService, KafkaTopics } from '../utils/kafka';
+import { getSocketService } from '../utils/socket';
+
+interface CachedSuspension {
+  userId: string;
+  reason: string;
+  expiresAt: string;
+}
+
+interface LoginResult {
+  user?: {
+    id: string;
+    email: string;
+    name: string;
+    isVerified: boolean;
+  };
+  message: string;
+  token?: string;
+}
 
 interface RegisterRequestBody {
   name: string;
@@ -84,6 +104,18 @@ export async function register(
     await sendVerificationEmail(email, userId);
     logger.info('Verification email sent', { userId, email });
     
+    // Publish user registration event
+    await kafkaService.publishEvent(KafkaTopics.USER_ACTIVITY, {
+      type: 'user_registered',
+      userId,
+      data: {
+        email,
+        name,
+        isVerified: false,
+        timestamp: new Date()
+      }
+    });
+    
     res.status(201).json({ message: 'User registered. Please verify your email.'});
   } catch (err) {
     logger.error('Registration failed', { 
@@ -127,6 +159,15 @@ export async function verifyEmail(
     logger.info('Email verified successfully', { 
       userId: token, 
       email: result[0].email 
+    });
+    
+    // Publish email verification event
+    await kafkaService.publishEvent(KafkaTopics.USER_ACTIVITY, {
+      type: 'email_verified',
+      userId: token,
+      data: {
+        timestamp: new Date()
+      }
     });
     
     res.json({ message: 'Email verified successfully' });
@@ -178,8 +219,41 @@ async function suspendAccount(userId: string, email: string, reason: string) {
     WHERE user_id = ${userId}
   `;
 
+  // Cache suspension status
+  await cacheSet(`suspension:${email}`, {
+    userId,
+    reason,
+    expiresAt
+  }, 24 * 60 * 60); // 24 hours
+
+  // Publish suspension event
+  await kafkaService.publishEvent(KafkaTopics.USER_ACTIVITY, {
+    type: 'account_suspended',
+    userId,
+    data: {
+      reason,
+      expiresAt,
+      timestamp: new Date()
+    }
+  });
+
   // Send suspension notification
-  await sendAccountSuspensionEmail(email, reason, expiresAt);
+  await kafkaService.publishEvent(KafkaTopics.NOTIFICATIONS, {
+    type: 'account_suspended',
+    userId,
+    title: 'Account Suspended',
+    message: `Your account has been temporarily suspended: ${reason}`,
+    data: {
+      expiresAt,
+      reason
+    }
+  });
+
+  // Force disconnect user's sockets
+  getSocketService().emitToUser(userId, 'account:suspended', {
+    reason,
+    expiresAt
+  });
 
   logger.warn('Account suspended', { userId, reason, expiresAt });
 }
@@ -405,6 +479,21 @@ export async function logout(req: Request, res: Response) {
       WHERE id = ${decoded.sessionId}
     `;
 
+    // Publish logout event
+    if (decoded.userId) {
+      await kafkaService.publishEvent(KafkaTopics.USER_ACTIVITY, {
+        type: 'logout',
+        userId: decoded.userId,
+        data: {
+          sessionId: decoded.sessionId,
+          timestamp: new Date()
+        }
+      });
+
+      // Broadcast offline status
+      getSocketService().broadcastUserStatus(decoded.userId, 'offline');
+    }
+
     logger.info('User logged out successfully', { 
       sessionId: decoded.sessionId,
       userId: decoded.userId 
@@ -463,7 +552,16 @@ export async function requestPasswordReset(
 
     logger.info('Password reset requested', { userId: user.id, email,resetToken });
     
-    res.json({ message: 'Password reset instructions sent to email'});
+    // Publish password reset request event
+    await kafkaService.publishEvent(KafkaTopics.USER_ACTIVITY, {
+      type: 'password_reset_requested',
+      userId: user.id,
+      data: {
+        timestamp: new Date()
+      }
+    });
+    
+    res.json({ message: 'Password reset email sent' });
   } catch (err) {
     logger.error('Password reset request failed', {
       email,
@@ -518,8 +616,17 @@ export async function resetPassword(
       `;
     });
 
+    // Publish password reset completion event
+    await kafkaService.publishEvent(KafkaTopics.USER_ACTIVITY, {
+      type: 'password_reset_completed',
+      userId,
+      data: {
+        timestamp: new Date()
+      }
+    });
+    
     logger.info('Password reset successful', { userId });
-    res.json({ message: 'Password has been reset successfully' });
+    res.json({ message: 'Password reset successful' });
   } catch (err) {
     logger.error('Password reset failed', {
       error: err instanceof Error ? err.message : 'Unknown error'
@@ -585,6 +692,15 @@ export async function requestAccountDeletion(req: AuthRequest, res: Response) {
       recoveryToken
     });
 
+    // Publish account deletion request event
+    await kafkaService.publishEvent(KafkaTopics.USER_ACTIVITY, {
+      type: 'account_deletion_requested',
+      userId,
+      data: {
+        timestamp: new Date()
+      }
+    });
+    
     res.json({ 
       message: 'Account deletion requested. You have 28 days to recover your account.'
     });
@@ -652,6 +768,15 @@ export async function recoverAccount(
       userId: deletionRecord.user_id 
     });
 
+    // Publish account recovery event
+    await kafkaService.publishEvent(KafkaTopics.USER_ACTIVITY, {
+      type: 'account_recovered',
+      userId,
+      data: {
+        timestamp: new Date()
+      }
+    });
+    
     res.json({ message: 'Account recovered successfully' });
   } catch (err) {
     logger.error('Account recovery failed', {
@@ -728,6 +853,17 @@ export async function loginCheck(
 ) {
   try {
     const { email } = req.body;
+
+    // Check cache for user suspension status
+    const suspensionKey = `suspension:${email}`;
+    const cachedSuspension = await cacheGet<CachedSuspension>(suspensionKey);
+    if (cachedSuspension) {
+      return res.status(403).json({
+        message: 'Account temporarily suspended',
+        suspensionExpiry: new Date(cachedSuspension.expiresAt)
+      });
+    }
+
     const users = await sql<User[]>`
       SELECT * FROM users 
       WHERE email = ${email}
@@ -750,9 +886,29 @@ export async function loginCheck(
           });
         }
       }
+
+      // Handle login separately to properly manage response
+      const loginResponse = await login(req, res);
+      
+      // If login was successful and response includes user data
+      if (loginResponse?.user) {
+        await kafkaService.publishEvent(KafkaTopics.USER_ACTIVITY, {
+          type: 'login',
+          userId: loginResponse.user.id,
+          data: {
+            email: loginResponse.user.email,
+            timestamp: new Date()
+          }
+        });
+
+        // Broadcast user status
+        getSocketService().broadcastUserStatus(loginResponse.user.id, 'online');
+      }
+      
+      return loginResponse;
     }
 
-    return existingLoginFunction(req, res);
+    return login(req, res);
   } catch (err) {
     logger.error('Login check failed', {
       error: err instanceof Error ? err.message : 'Unknown error'
@@ -873,9 +1029,26 @@ export async function editProfile(
       RETURNING *
     `;
 
-    console.log('Database update successful:', { 
+    // Invalidate user cache
+    await cacheDelete(`user:${userId}`);
+    await cacheDelete(`user:${userId}:profile`);
+
+    // Publish profile update event
+    await kafkaService.publishEvent(KafkaTopics.USER_ACTIVITY, {
+      type: 'profile_updated',
+      userId,
+      data: {
+        updatedFields: Object.keys(req.body),
+        hasAvatar: !!avatarUrl,
+        timestamp: new Date()
+      }
+    });
+
+    // Notify connected clients
+    getSocketService().emitToUser(userId, 'profile:updated', {
+      userId,
       updatedFields: Object.keys(req.body),
-      hasAvatar: !!avatarUrl 
+      hasAvatar: !!avatarUrl
     });
 
     logger.info('Profile updated successfully', { 

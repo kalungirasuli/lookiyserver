@@ -19,6 +19,9 @@ Whether you're attending a conference, managing a school club, or setting up a c
 - Reset password via OTP email
 - Public or private profile visibility
 - Avatar upload or random avatar generator
+- Real-time user status (online/offline)
+- Instant profile updates across devices
+- Live session management and device tracking
 
 ### 🌐 Network System
 - Create public or private groups (networks)
@@ -26,6 +29,9 @@ Whether you're attending a conference, managing a school club, or setting up a c
 - Passcode required for private networks
 - Set network roles: Admins, Leaders, VIPs, Moderators
 - Reset network passcode (admin only)
+- Real-time network updates and notifications
+- Live member activity tracking
+- Instant join request notifications
 
 ### 🤝 Connections & Community
 - Send, accept, reject connection requests
@@ -34,6 +40,9 @@ Whether you're attending a conference, managing a school club, or setting up a c
 - Access limited profiles before connection approval
 - Private in-network chat
 - Public open space for posts with tagging
+- Real-time messaging and notifications
+- Live network feed updates
+- Instant connection status updates
 
 ### 🔍 Discovery & Search
 - Search users by name, interest, description, and network
@@ -45,6 +54,20 @@ Whether you're attending a conference, managing a school club, or setting up a c
 - Match users based on interests, description, goals, and activity
 - Personalized suggestions within and across networks
 - Users can select or create interest tags for deeper matching
+
+---
+
+## 🚀 Real-Time Features
+- **Live Status Updates**: See when network members are online/offline
+- **Instant Notifications**: Receive immediate alerts for:
+  - Network join requests
+  - Connection requests
+  - Profile updates
+  - Role changes
+  - Account status changes
+- **Real-Time Messaging**: Direct messaging between network members
+- **Live Activity Feed**: See network updates as they happen
+- **Multi-Device Sync**: Changes reflect instantly across all devices
 
 ---
 
@@ -60,20 +83,30 @@ Where people gather — **Lookiy** brings connections to life.
 
 ---
 
-## 🧰 Tech Stack
+## 🏗️ Architecture
 
+### Core Technologies
 - **Backend:** Node.js + Express
 - **Database:** PostgreSQL
+- **Caching:** Redis
+- **Message Queue:** Apache Kafka
+- **Real-time:** Socket.IO
 - **Authentication:** JWT, OTP, Email Verification
 - **AI Matching:** Hugging Face `all-MiniLM-L6-v2` + FAISS
-- **Messaging:**  Socket.IO (optional)
-- **QR & Sharing:** Dynamic QR code and tagname generator
+- **Storage:** Google Cloud Storage
 - **Deployment:** Docker, Render, Railway, or cloud provider
+
+### Infrastructure
+- Redis for session management and caching
+- Kafka for event streaming and message processing
+- Socket.IO with Redis adapter for horizontal scaling
+- PostgreSQL for persistent data storage
 
 ---
 
 ## 🛠️ Getting Started
 
+### Using Docker (Recommended)
 ```bash
 # 1. Clone the repository
 git clone https://github.com/kalungirasuli/lookiy.git
@@ -81,56 +114,106 @@ git clone https://github.com/kalungirasuli/lookiy.git
 # 2. Navigate to the backend
 cd lookiyserver
 
-# 3. Install dependencies
-npm install    
-
-# 4. Setup environment variables
+# 3. Copy environment variables
 cp .env.example .env
 
-# 5. Run the app
-npm run dev   
+# 4. Start the services
+docker-compose up -d
 
+# 5. Check logs
+docker-compose logs -f app
 ```
-# Contributing
-[🔐 [ISSUE] Implement User Registration with Email Verification #28
-](https://github.com/kalungirasuli/lookiyserver/issues/28)
-[🧾 [ISSUE] User Privacy Options (Public vs Network-Only) #21
-](https://github.com/kalungirasuli/lookiyserver/issues/21)
-[📁 [ISSUE] Save & List Connections (Followers) #20
-](https://github.com/kalungirasuli/lookiyserver/issues/20)
-[🧠 [ISSUE] Create Interest Tags for Smart Matching #18
-](https://github.com/kalungirasuli/lookiyserver/issues/18)
-[👀 [ISSUE] View Profiles Before Connection Approval #17
-](https://github.com/kalungirasuli/lookiyserver/issues/17)
-[🧵 [ISSUE] Recommend Users via HuggingFace all-MiniLM-L6-v2 #16
-](https://github.com/kalungirasuli/lookiyserver/issues/16)
-[🔍 [ISSUE] Search Users in Network #15
-](https://github.com/kalungirasuli/lookiyserver/issues/15)
-[📣 [ISSUE] Post in Network Open Space #14
-](https://github.com/kalungirasuli/lookiyserver/issues/14)
-[🗨️ [ISSUE] Implement Private Messaging in Network #13
-](https://github.com/kalungirasuli/lookiyserver/issues/13)
-[🛑 [ISSUE] Block Incoming Connection Requests #12
-](https://github.com/kalungirasuli/lookiyserver/issues/12)
-[🔗 [ISSUE] Send & Manage Connection Requests #11
-](https://github.com/kalungirasuli/lookiyserver/issues/11)
-[🧩 [ISSUE] Set Network Hierarchy Roles #10
-](https://github.com/kalungirasuli/lookiyserver/issues/10)
-[🧑‍🤝‍🧑 [ISSUE] View Network Members #9
-](https://github.com/kalungirasuli/lookiyserver/issues/9)
-[🔐 [ISSUE] Reset Network Passcode (Admin Only) #8
-](https://github.com/kalungirasuli/lookiyserver/issues/8)
-[➕ [ISSUE] Join Network [Public/Private] #7
-](https://github.com/kalungirasuli/lookiyserver/issues/7)
-[🔎 [ISSUE] Search Networks by Tag Name #6
-](https://github.com/kalungirasuli/lookiyserver/issues/6)
-[🌐 [ISSUE] Create Network (Group) [Public/Private] #5
-](https://github.com/kalungirasuli/lookiyserver/issues/5)
-[🧾 [ISSUE] User Profile Editing #4
-](https://github.com/kalungirasuli/lookiyserver/issues/4)
-[🔑 [ISSUE] JWT-Based User Login #3
-](https://github.com/kalungirasuli/lookiyserver/issues/3)
-[🔄 [ISSUE] OTP-Based Password Reset #2
-](https://github.com/kalungirasuli/lookiyserver/issues/2)
-[📋 [ISSUE] Data collections from users. #29
-](https://github.com/kalungirasuli/lookiyserver/issues/29)
+
+### Manual Setup
+```bash
+# 1. Clone and install dependencies
+git clone https://github.com/kalungirasuli/lookiy.git
+cd lookiyserver
+npm install
+
+# 2. Set up infrastructure
+- Install and start PostgreSQL
+- Install and start Redis
+- Install and configure Kafka + Zookeeper
+
+# 3. Configure environment
+cp .env.example .env
+# Edit .env with your configuration
+
+# 4. Run migrations
+npm run migrate
+
+# 5. Start the server
+npm run dev
+```
+
+---
+
+## 🌍 Deployment
+
+### Infrastructure Requirements
+- PostgreSQL database
+- Redis instance for caching
+- Kafka cluster for event streaming
+- Storage bucket (Google Cloud Storage or similar)
+
+### Environment Variables
+See `.env.example` for required configuration variables.
+
+### Deployment Options
+1. **Docker Deployment**
+   - Use provided Dockerfile and docker-compose.yml
+   - Configure environment variables
+   - Deploy to any container platform
+
+2. **Platform as a Service**
+   - Deploy to Render, Railway, or similar
+   - Set up required add-ons:
+     - PostgreSQL
+     - Redis
+     - Kafka
+   - Configure environment variables
+
+3. **Cloud Provider (AWS/GCP/Azure)**
+   - Deploy using container services
+   - Use managed services for:
+     - Database (RDS/Cloud SQL)
+     - Redis (ElastiCache/Memorystore)
+     - Kafka (MSK/Pub/Sub)
+   - Set up load balancing and auto-scaling
+
+### Monitoring & Scaling
+- Use provided logging system (Winston)
+- Monitor Kafka topics and consumers
+- Scale Socket.IO nodes with Redis adapter
+- Configure database connection pooling
+
+---
+
+## 🤝 Contributing
+We welcome contributions to **Lookiy**! To get involved:
+1. Check our [open issues](https://github.com/kalungirasuli/lookiyserver/issues) to find ways you can help.
+2. Fork the repository and create a new branch for your feature or bugfix.
+3. Make your changes and commit them with clear, descriptive messages.
+4. Push your branch to your forked repository.
+5. Submit a pull request to the main repository, detailing your changes and the issue it addresses.
+
+Join us in making **Lookiy** better for everyone!
+
+---
+
+## 📜 License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 📞 Contact
+For questions or feedback, please reach out:
+- Email: support@lookiy.app
+- GitHub: [kalungirasuli](https://github.com/kalungirasuli)
+
+Let's connect and grow together!
+
+---
+
+*Made with ❤️ by the Lookiy Team*

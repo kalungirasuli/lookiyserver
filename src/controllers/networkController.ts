@@ -7,6 +7,19 @@ import { generateCustomQR } from '../utils/qrGenerator';
 import { uploadToGCS } from '../utils/storage';
 import logger from '../utils/logger';
 import crypto from 'crypto';
+import { cacheGet, cacheSet, cacheDelete, cacheInvalidatePattern } from '../utils/redis';
+import { kafkaService, KafkaTopics } from '../utils/kafka';
+import { getSocketService } from '../utils/socket';
+
+// Helper function for real-time events
+async function emitNetworkEvent(type: string, networkId: string, data: any, userId?: string) {
+  await kafkaService.publishEvent(KafkaTopics.NETWORK_UPDATES, {
+    type,
+    networkId,
+    userId,
+    data
+  });
+}
 
 interface CreateNetworkBody {
   title: string;
@@ -55,7 +68,25 @@ export async function createNetwork(
       .replace(/[^a-z0-9]/g, '') // Remove non-alphanumeric
       .substring(0, 20); // Limit length
     const randomSuffix = crypto.randomBytes(3).toString('hex');
-    const tagName = `@${baseTag}${randomSuffix}`;
+    // FIRST CHECK IF TAG NAME ALREADY EXISTS WITH OUT SUFFIX
+    const existingNetworks = await sql<Network[]>`
+      SELECT * FROM networks WHERE tag_name=${baseTag}
+    `;
+    //LOOP TO CHECK IT THE TAG NAME WITH OUT SUFFIX EXISTS IF EXIST THEN ADD SUFFIX AND CHECK UNTILL IS NOT EXIST
+    let tagName = baseTag;
+    if (existingNetworks.length > 0) {
+      let suffixIndex = 1;
+      while (existingNetworks.length > 0) {
+        tagName = `${baseTag}${randomSuffix}`;
+        const checkTag = await sql<Network[]>`
+          SELECT * FROM networks WHERE tag_name=${tagName}
+        `;
+        if (checkTag.length === 0) {
+          break;
+        }
+        suffixIndex++;
+      }
+    }
 
     // Create network and set creator as admin in a transaction
     const result = await sql.begin(async sql => {
@@ -102,8 +133,19 @@ export async function createNetwork(
         // Continue without avatar
       }
 
+      // After successful creation, publish event
+      await kafkaService.publishEvent(KafkaTopics.NETWORK_UPDATES, {
+        type: 'created',
+        networkId: network.id,
+        userId: userId,
+        data: network
+      });
+
       return network;
     });
+
+    // Cache the new network
+    await cacheSet(`network:${result.id}`, result, 3600); // Cache for 1 hour
 
     logger.info('Network created successfully', {
       networkId: result.id,
@@ -302,12 +344,18 @@ export async function editNetwork(
       RETURNING *
     `;
 
+    // Invalidate relevant caches
+    await cacheInvalidatePattern(`network:${id}:*`);
+
     logger.info('Network updated successfully', {
       networkId: id,
       updatedBy: userId,
       updatedFields: Object.keys(updates),
       privacyChanged: updates.isPrivate !== undefined
     });
+
+    // Emit real-time update
+    await emitNetworkEvent('updated', id, result[0], userId);
 
     res.json({
       message: 'Network updated successfully',
@@ -330,7 +378,7 @@ export async function assignRole(
   req: AuthRequest,
   res: Response
 ) {
-  const { id: networkId, userId } = req.params;
+  const { id: networkId, userId: targetUserId } = req.params;
   const { role } = req.body as AssignRoleBody;
   const adminId = req.user?.id;
 
@@ -363,7 +411,7 @@ export async function assignRole(
     const members = await sql<NetworkMember[]>`
       SELECT * FROM network_members
       WHERE network_id = ${networkId}
-        AND user_id = ${userId}
+        AND user_id = ${targetUserId}
     `;
 
     if (members.length === 0) {
@@ -380,16 +428,43 @@ export async function assignRole(
       UPDATE network_members
       SET role = ${role}
       WHERE network_id = ${networkId}
-        AND user_id = ${userId}
+        AND user_id = ${targetUserId}
       RETURNING *
     `;
 
+    // Invalidate relevant caches
+    await cacheInvalidatePattern(`network:${networkId}:*`);
+
+    // Publish role change event
+    await kafkaService.publishEvent(KafkaTopics.NETWORK_UPDATES, {
+      type: 'role_changed',
+      networkId,
+      userId: targetUserId,
+      data: { role, updatedBy: adminId }
+    });
+
+    // Send notification to affected user
+    await kafkaService.publishEvent(KafkaTopics.NOTIFICATIONS, {
+      type: 'role_update',
+      userId: targetUserId,
+      title: 'Role Updated',
+      message: `Your role in the network has been updated to ${role}`,
+      data: { networkId, role }
+    });
+
     logger.info('Network role updated', {
       networkId,
-      userId,
+      userId: targetUserId,
       newRole: role,
       updatedBy: adminId
     });
+
+    // Emit real-time update
+    await emitNetworkEvent('role_changed', networkId, { 
+      userId: targetUserId, 
+      role: role,
+      updatedBy: adminId 
+    }, targetUserId);
 
     res.json({
       message: 'Role updated successfully',
@@ -398,7 +473,7 @@ export async function assignRole(
   } catch (error) {
     logger.error('Role assignment failed', {
       networkId,
-      userId,
+      userId: targetUserId,
       error: error instanceof Error ? error.message : 'Unknown error'
     });
     res.status(500).json({ message: 'Failed to assign role' });
@@ -477,6 +552,19 @@ export async function removeMember(
       memberRole
     });
 
+    // After successful removal, emit activity
+    await emitNetworkActivity(networkId, {
+      type: 'member_removed',
+      userId: memberToRemove,
+      data: { removedBy: removerId, role: memberRole }
+    });
+
+    // Emit real-time update
+    await emitNetworkEvent('member_removed', networkId, { 
+      userId: memberToRemove,
+      removedBy: removerId 
+    }, memberToRemove);
+
     res.json({ message: 'Member removed successfully' });
   } catch (error) {
     logger.error('Failed to remove network member', {
@@ -521,11 +609,30 @@ export async function approveMember(
       RETURNING *
     `;
 
+    // Invalidate relevant caches
+    await cacheInvalidatePattern(`network:${networkId}:*`);
+
     logger.info('New network member approved', {
       networkId,
       newMemberId,
       approvedByUserId: approverId
     });
+
+    // Notify the new member
+    await kafkaService.publishEvent(KafkaTopics.NOTIFICATIONS, {
+      type: 'welcome',
+      userId: newMemberId,
+      title: 'Welcome to the Network',
+      message: 'You have been approved to join the network.',
+      data: { networkId }
+    });
+
+    // Emit real-time update
+    await emitNetworkEvent('member_joined', networkId, { 
+      userId: newMemberId,
+      role: 'member',
+      approvedBy: approverId 
+    }, newMemberId);
 
     res.status(201).json({
       message: 'New member approved successfully',
@@ -579,11 +686,37 @@ export async function promoteToAdmin(
       RETURNING *
     `;
 
+    // Invalidate relevant caches
+    await cacheInvalidatePattern(`network:${networkId}:*`);
+
     logger.info('Member promoted to admin', {
       networkId,
       userId: targetUserId,
       promotedBy: adminId
     });
+
+    // Notify the promoted member
+    await kafkaService.publishEvent(KafkaTopics.NOTIFICATIONS, {
+      type: 'role_update',
+      userId: targetUserId,
+      title: 'Congratulations!',
+      message: 'You have been promoted to admin in the network.',
+      data: { networkId, role: 'admin' }
+    });
+
+    // After successful promotion, emit activity
+    await emitNetworkActivity(networkId, {
+      type: 'role_changed',
+      userId: targetUserId,
+      data: { role: 'admin', updatedBy: adminId }
+    });
+
+    // Emit real-time update
+    await emitNetworkEvent('role_changed', networkId, { 
+      userId: targetUserId, 
+      role: 'admin',
+      updatedBy: adminId 
+    }, targetUserId);
 
     res.json({
       message: 'Member promoted to admin successfully',
@@ -640,10 +773,29 @@ export async function resignAdmin(
       RETURNING *
     `;
 
+    // Invalidate relevant caches
+    await cacheInvalidatePattern(`network:${networkId}:*`);
+
     logger.info('Admin resigned', {
       networkId,
       userId
     });
+
+    // Notify the resigned admin
+    await kafkaService.publishEvent(KafkaTopics.NOTIFICATIONS, {
+      type: 'role_update',
+      userId: userId,
+      title: 'Role Update',
+      message: 'You have resigned from the admin role.',
+      data: { networkId, role: 'member' }
+    });
+
+    // Emit real-time update
+    await emitNetworkEvent('role_changed', networkId, { 
+      userId: userId, 
+      role: 'member',
+      updatedBy: userId 
+    }, userId);
 
     res.json({
       message: 'Resigned from admin role successfully',
@@ -719,6 +871,17 @@ export async function requestJoin(
           INSERT INTO network_members (network_id, user_id, role)
           VALUES (${networkId}, ${userId}, 'member')
         `;
+        // Publish member joined event
+        await kafkaService.publishEvent(KafkaTopics.NETWORK_UPDATES, {
+          type: 'member_joined',
+          networkId,
+          userId,
+          data: { role: 'member' }
+        });
+
+        // Invalidate member cache
+        await cacheInvalidatePattern(`network:${networkId}:*`);
+
         return res.status(201).json({ message: 'Joined network successfully' });
 
       case 'passcode':
@@ -741,6 +904,17 @@ export async function requestJoin(
           INSERT INTO network_members (network_id, user_id, role)
           VALUES (${networkId}, ${userId}, 'member')
         `;
+        // Publish member joined event
+        await kafkaService.publishEvent(KafkaTopics.NETWORK_UPDATES, {
+          type: 'member_joined',
+          networkId,
+          userId,
+          data: { role: 'member' }
+        });
+
+        // Invalidate member cache
+        await cacheInvalidatePattern(`network:${networkId}:*`);
+
         return res.status(201).json({ message: 'Joined network successfully' });
 
       case 'manual':
@@ -754,8 +928,21 @@ export async function requestJoin(
           RETURNING *
         `;
 
-        // Notify admins and moderators (implementation depends on your notification system)
-        // TODO: Implement notification system
+        // Publish join request event
+        await kafkaService.publishEvent(KafkaTopics.JOIN_REQUESTS, {
+          type: 'created',
+          networkId,
+          userId,
+          requestId: request[0].id,
+          data: request[0]
+        });
+
+        // Notify admins via socket
+        getSocketService().emitToNetworkAdmins(networkId, 'join:request', {
+          networkId,
+          userId,
+          requestId: request[0].id
+        });
 
         return res.status(202).json({ 
           message: 'Join request submitted. Waiting for admin/moderator approval.',
@@ -812,9 +999,9 @@ export async function handleJoinRequest(
 
     const request = requests[0];
 
-    if (action === 'approve') {
-      // Add as member and update request status
-      await sql.begin(async sql => {
+    const updatedRequest = await sql.begin(async sql => {
+      if (action === 'approve') {
+        // Add as member and update request status
         await sql`
           INSERT INTO network_members (network_id, user_id, role)
           VALUES (${networkId}, ${request.user_id}, 'member')
@@ -825,31 +1012,48 @@ export async function handleJoinRequest(
           SET status = 'approved'
           WHERE id = ${requestId}
         `;
-      });
 
-      logger.info('Join request approved', {
+        // Publish member joined event
+        await kafkaService.publishEvent(KafkaTopics.NETWORK_UPDATES, {
+          type: 'member_joined',
+          networkId,
+          userId: request.user_id,
+          data: { role: 'member' }
+        });
+
+        // Invalidate member cache
+        await cacheInvalidatePattern(`network:${networkId}:*`);
+      } else {
+        // Reject request
+        await sql`
+          UPDATE pending_network_joins
+          SET status = 'rejected'
+          WHERE id = ${requestId}
+        `;
+      }
+
+      // Publish event based on action
+      await kafkaService.publishEvent(KafkaTopics.JOIN_REQUESTS, {
+        type: action,
         networkId,
         userId: request.user_id,
-        approvedBy: adminId
+        requestId,
+        data: { approvedBy: adminId }
       });
 
-      res.json({ message: 'Join request approved' });
-    } else {
-      // Reject request
-      await sql`
-        UPDATE pending_network_joins
-        SET status = 'rejected'
-        WHERE id = ${requestId}
-      `;
+      return request;
+    });
 
-      logger.info('Join request rejected', {
-        networkId,
-        userId: request.user_id,
-        rejectedBy: adminId
-      });
+    // Send notification to user
+    await kafkaService.publishEvent(KafkaTopics.NOTIFICATIONS, {
+      type: 'join_request_' + action,
+      userId: request.user_id,
+      title: `Join Request ${action === 'approve' ? 'Approved' : 'Rejected'}`,
+      message: `Your request to join the network has been ${action === 'approve' ? 'approved' : 'rejected'}`,
+      data: { networkId }
+    });
 
-      res.json({ message: 'Join request rejected' });
-    }
+    res.json({ message: `Join request ${action}ed` });
   } catch (error) {
     logger.error('Failed to handle join request', {
       networkId,
@@ -894,7 +1098,7 @@ export async function createInvitations(
 
     // Create invitations in a transaction
     const invitations = await sql.begin(async sql => {
-      const results = [];
+      const results: NetworkInvitation[] = [];
       for (const userId of userIds) {
         // Check if user already has an active invitation
         const existing = await sql<NetworkInvitation[]>`
@@ -918,9 +1122,33 @@ export async function createInvitations(
             RETURNING *
           `;
           results.push(invite);
+          
+          // Send real-time notification to invited user
+          await kafkaService.publishEvent(KafkaTopics.NOTIFICATIONS, {
+            type: 'network_invitation',
+            userId,
+            title: 'Network Invitation',
+            message: `You have been invited to join a network`,
+            data: {
+              networkId,
+              invitedBy: adminId,
+              role,
+              expiresAt
+            }
+          });
         }
       }
       return results;
+    });
+
+    // Emit activity for network members
+    await emitNetworkActivity(networkId, {
+      type: 'invitations_created',
+      userId: adminId,
+      data: {
+        count: invitations.length,
+        roles: invitations.map(i => i.role)
+      }
     });
 
     logger.info('Network invitations created', {
@@ -1149,6 +1377,20 @@ export async function createNetworkGoal(
       createdBy: adminId
     });
 
+    // After successful goal creation, emit activity
+    await emitNetworkActivity(networkId, {
+      type: 'goal_created',
+      userId: adminId,
+      data: goal[0]
+    });
+
+    // Emit real-time update
+    await emitNetworkEvent('goal_created', networkId, {
+      goalId: goal[0].id,
+      createdBy: adminId,
+      goalData: goal[0]
+    }, adminId);
+
     res.status(201).json({
       message: 'Goal created successfully',
       goal: goal[0]
@@ -1252,11 +1494,45 @@ export async function updateNetworkGoal(
       return res.status(404).json({ message: 'Goal not found' });
     }
 
+    // Emit goal update activity
+    await emitNetworkActivity(networkId, {
+      type: 'goal_updated',
+      userId: adminId,
+      data: {
+        goalId,
+        updates,
+        goal: goals[0]
+      }
+    });
+
+    // Also notify users who selected this goal
+    const usersWithGoal = await sql`
+      SELECT DISTINCT user_id
+      FROM user_network_goals
+      WHERE network_id = ${networkId}
+        AND goal_id = ${goalId}
+    `;
+
+    for (const { user_id } of usersWithGoal) {
+      getSocketService().emitToUser(user_id, 'goal:update', {
+        networkId,
+        goalId,
+        goal: goals[0]
+      });
+    }
+
     logger.info('Network goal updated', {
       networkId,
       goalId,
       updatedBy: adminId
     });
+
+    // Emit real-time update
+    await emitNetworkEvent('goal_updated', networkId, {
+      goalId,
+      updatedBy: adminId,
+      changes: updates
+    }, adminId);
 
     res.json({
       message: 'Goal updated successfully',
@@ -1290,17 +1566,57 @@ export async function deleteNetworkGoal(
       return res.status(403).json({ message: 'Only network admins can delete goals' });
     }
 
-    await sql`
-      DELETE FROM network_goals
-      WHERE id = ${goalId}
-        AND network_id = ${networkId}
+    // Get users who selected this goal before deletion
+    const usersWithGoal = await sql`
+      SELECT DISTINCT user_id
+      FROM user_network_goals
+      WHERE network_id = ${networkId}
+        AND goal_id = ${goalId}
     `;
+
+    await sql.begin(async sql => {
+      // Delete goal selections first
+      await sql`
+        DELETE FROM user_network_goals
+        WHERE goal_id = ${goalId}
+          AND network_id = ${networkId}
+      `;
+
+      // Then delete the goal
+      await sql`
+        DELETE FROM network_goals
+        WHERE id = ${goalId}
+          AND network_id = ${networkId}
+      `;
+    });
+
+    // Emit goal deletion activity
+    await emitNetworkActivity(networkId, {
+      type: 'goal_deleted',
+      userId: adminId,
+      data: { goalId }
+    });
+
+    // Notify users who had this goal selected
+    for (const { user_id } of usersWithGoal) {
+      getSocketService().emitToUser(user_id, 'goal:deleted', {
+        networkId,
+        goalId
+      });
+    }
 
     logger.info('Network goal deleted', {
       networkId,
       goalId,
-      deletedBy: adminId
+      deletedBy: adminId,
+      affectedUsers: usersWithGoal.length
     });
+
+    // Emit real-time update
+    await emitNetworkEvent('goal_deleted', networkId, {
+      goalId,
+      deletedBy: adminId
+    }, adminId);
 
     res.json({ message: 'Goal deleted successfully' });
   } catch (error) {
@@ -1375,6 +1691,23 @@ export async function selectNetworkGoals(
       }
     });
 
+    // Emit goal selection activity
+    await emitNetworkActivity(networkId, {
+      type: 'goals_selected',
+      userId,
+      data: {
+        goalIds,
+        timestamp: new Date()
+      }
+    });
+
+    // Notify network admins
+    getSocketService().emitToNetworkAdmins(networkId, 'member:goals', {
+      userId,
+      goalIds,
+      type: 'selected'
+    });
+
     logger.info('User network goals updated', {
       networkId,
       userId,
@@ -1404,6 +1737,12 @@ export async function getNetworkMembers(
   }
 
   try {
+    // Try to get from cache first
+    const cachedMembers = await cacheGet(`network:${networkId}:members`);
+    if (cachedMembers) {
+      return res.json({ members: cachedMembers });
+    }
+
     // Check if user is a member
     const isMember = await sql<NetworkMember[]>`
       SELECT * FROM network_members
@@ -1440,6 +1779,9 @@ export async function getNetworkMembers(
       GROUP BY u.id, u.name, u.email, u.avatar, nm.role, nm.joined_at
       ORDER BY nm.role != 'admin', nm.role != 'moderator', nm.joined_at DESC
     `;
+
+    // Cache the results
+    await cacheSet(`network:${networkId}:members`, members, 300); // Cache for 5 minutes
 
     res.json({ members });
   } catch (error) {
@@ -1508,6 +1850,9 @@ export async function updateNetworkPasscode(
       updatedBy: adminId
     });
 
+    // Emit real-time update
+    await emitNetworkEvent('passcode_updated', networkId, { updatedBy: adminId }, adminId);
+
     res.json({
       message: 'Network passcode updated successfully'
     });
@@ -1518,4 +1863,26 @@ export async function updateNetworkPasscode(
     });
     res.status(500).json({ message: 'Failed to update network passcode' });
   }
+}
+
+// Add activity streaming for network events
+async function emitNetworkActivity(networkId: string, activity: {
+  type: string;
+  userId?: string;
+  data?: any;
+}) {
+  // Emit to all network members
+  getSocketService().emitToNetwork(networkId, 'network:activity', activity);
+
+  // Cache recent activity
+  const cacheKey = `network:${networkId}:activity`;
+  const recentActivity = await cacheGet<any[]>(cacheKey) || [];
+  recentActivity.unshift({ ...activity, timestamp: new Date() });
+  
+  // Keep last 50 activities
+  if (recentActivity.length > 50) {
+    recentActivity.pop();
+  }
+  
+  await cacheSet(cacheKey, recentActivity, 24 * 60 * 60); // Cache for 24 hours
 }

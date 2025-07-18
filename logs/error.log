@@ -1,3 +1,0 @@
-{"timestamp":"2025-07-17T14:36:51.197Z","level":"error","message":"Error creating database tables","error":"syntax error at or near \")\""}
-{"timestamp":"2025-07-17T14:36:52.547Z","level":"error","message":"Error creating database tables","error":"syntax error at or near \")\""}
-{"timestamp":"2025-07-17T15:07:38.524Z","level":"error","message":"Invalid network ID format","networkId":" 88a94399-ae75-4135-b89e-5e24c313e6da"}
