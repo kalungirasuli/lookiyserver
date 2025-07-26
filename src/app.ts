@@ -10,6 +10,7 @@ import logger from './utils/logger'
 import { runMigrations } from './utils/migrations'
 import { startScheduledJobs } from './utils/scheduler'
 import {  getSocketService, initializeSocketService } from './utils/socket'
+import { initializeSockets } from './sockets'
 import { authenticate } from './middleware/auth'
 import path from 'path'
 import { kafkaService } from './utils/kafka'
@@ -21,7 +22,8 @@ const server = http.createServer(app)
 const port = process.env.PORT || 3000
 
 // Initialize Socket.IO
-initializeSocketService(server)
+initializeSockets(server)
+// initializeSocketService(server)
 
 // Initialize Kafka
 kafkaService.initialize()
@@ -61,7 +63,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3001',
+  origin: process.env.FRONTEND_URL || "*",//'http://localhost:3001',
   credentials: true,
 }))
 

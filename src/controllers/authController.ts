@@ -384,15 +384,15 @@ async function login(
         AND id != ${sessionId}
     `;
 
-    if (activeSessions.length > 0) {
-      await sendLoginAlertEmail(
-        user.email,
-        deviceInfo,
-        ipAddress,
-        sessionId,
-        user.id
-      );
-    }
+    // if (activeSessions.length > 0) {
+    //   await sendLoginAlertEmail(
+    //     user.email,
+    //     deviceInfo,
+    //     ipAddress,
+    //     sessionId,
+    //     user.id
+    //   );
+    // }
 
     logger.info('User logged in successfully', {
       userId: user.id,

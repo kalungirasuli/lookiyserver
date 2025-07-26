@@ -9,6 +9,9 @@ const userSockets = new Map<string, Set<string>>();
 const networkRooms = new Map<string, Set<string>>();
 const networkAdminRooms = new Map<string, Set<string>>();
 
+// Define public namespaces that don't require authentication
+const PUBLIC_NAMESPACES = ['/network-search', '/public', '/guest'];
+
 export function initializeSocketService(server: HttpServer) {
   io = new Server(server, {
     cors: {
@@ -17,24 +20,39 @@ export function initializeSocketService(server: HttpServer) {
     }
   });
 
+  // Global middleware for authentication
   io.use(async (socket, next) => {
     try {
+      // Skip authentication for public namespaces
+      if (PUBLIC_NAMESPACES.includes(socket.nsp.name)) {
+        return next();
+      }
+
       const token = socket.handshake.auth.token;
       if (!token) {
         return next(new Error('Authentication token required'));
       }
+      
       const user = await verifyToken(token);
       if (!user) {
         return next(new Error('Invalid token'));
       }
+      
       socket.data.user = user;
       next();
     } catch (error) {
+      logger.error('Socket authentication error:', error);
       next(new Error('Authentication error'));
     }
   });
 
+  // Handle authenticated connections
   io.on('connection', async (socket) => {
+    // Skip user tracking for public namespaces
+    if (PUBLIC_NAMESPACES.includes(socket.nsp.name)) {
+      return;
+    }
+
     const userId = socket.data.user.id;
     
     // Handle duplicate connections
@@ -99,6 +117,8 @@ export function initializeSocketService(server: HttpServer) {
 
   // Subscribe to Kafka events
   subscribeToKafkaEvents();
+  
+  return io;
 }
 
 function subscribeToKafkaEvents() {
@@ -126,6 +146,12 @@ function subscribeToKafkaEvents() {
     if (type === 'member:join') {
       emitToNetwork(networkId, 'member:join', { userId, ...data });
     }
+  });
+
+  // User activity updates
+  kafkaService.subscribe(KafkaTopics.USER_ACTIVITY, async (message) => {
+    const { type, userId, data } = message;
+    emitToUser(userId, `user:${type}`, data);
   });
 }
 

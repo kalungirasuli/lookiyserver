@@ -4,6 +4,16 @@ FROM node:lts-alpine
 # Create app directory
 WORKDIR /app
 
+# Install build dependencies
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    cairo-dev \
+    jpeg-dev \
+    pango-dev \
+    giflib-dev
+
 # Install dependencies
 COPY package*.json ./
 RUN npm install

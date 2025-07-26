@@ -33,9 +33,9 @@ export interface Network extends BaseModel {
   description?: string;
   is_private: boolean;
   passcode?: string;
-  avatar?: string;
   approval_mode: 'manual' | 'passcode' | 'auto';
-  last_passcode_update?: Date;
+  avatar?: string;
+  member_count?: number;  // Adding member count from SQL query
 }
 
 export interface NetworkMember extends BaseModel {

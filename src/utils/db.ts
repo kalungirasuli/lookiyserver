@@ -1,11 +1,14 @@
 import postgres from 'postgres';
 import logger from './logger';
-
+import { config } from 'dotenv';
+import process from 'process';
+// Load environment variables
+config();
 const sql = postgres({
   host: 'localhost',
-  port: 5432,
-  username: 'admin',
-  password: 'supersecretpassword',
+  port: process.env.POSTGRES_PORT,//5432,
+  username: process.env.POSTGRES_USERNAME, //'admin',
+  password:process.env.POSTGRES_PASSWORD, //'supersecretpassword',
   database: 'lookiy',
   onnotice: msg => logger.info('Database notice', { msg }),
   debug: (connection, query, params) => {
