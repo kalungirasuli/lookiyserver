@@ -74,7 +74,7 @@ export async function generateCustomQR(
   // Generate QR code with the formatted URL
   const qrData = await QRCode.create(formattedData, {
     errorCorrectionLevel: 'H',
-    margin: 0
+    // margin: 0
   });
 
   // Calculate dimensions

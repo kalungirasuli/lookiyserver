@@ -122,37 +122,51 @@ export function initializeSocketService(server: HttpServer) {
 }
 
 function subscribeToKafkaEvents() {
-  // Network updates
-  kafkaService.subscribe(KafkaTopics.NETWORK_UPDATES, async (message) => {
-    const { type, networkId, userId, data } = message;
-    emitToNetwork(networkId, 'network_event', { type, data });
-  });
+  try {
+    // Network updates
+    kafkaService.subscribe(KafkaTopics.NETWORK_UPDATES, async (message) => {
+      const { type, networkId, userId, data } = message;
+      emitToNetwork(networkId, 'network_event', { type, data });
+    }).catch(error => {
+      logger.warn('Failed to subscribe to network updates:', error);
+    });
 
-  // Join requests
-  kafkaService.subscribe(KafkaTopics.JOIN_REQUESTS, async (message) => {
-    const { networkId, userId, requestId, type } = message;
-    emitToNetworkAdmins(networkId, 'join:request', { networkId, userId, requestId, type });
-  });
+    // Join requests
+    kafkaService.subscribe(KafkaTopics.JOIN_REQUESTS, async (message) => {
+      const { networkId, userId, requestId, type } = message;
+      emitToNetworkAdmins(networkId, 'join:request', { networkId, userId, requestId, type });
+    }).catch(error => {
+      logger.warn('Failed to subscribe to join requests:', error);
+    });
 
-  // Notifications
-  kafkaService.subscribe(KafkaTopics.NOTIFICATIONS, async (message) => {
-    const { userId, type, title, message: notificationMessage } = message;
-    emitToUser(userId, 'notification', { type, title, message: notificationMessage });
-  });
+    // Notifications
+    kafkaService.subscribe(KafkaTopics.NOTIFICATIONS, async (message) => {
+      const { userId, type, title, message: notificationMessage } = message;
+      emitToUser(userId, 'notification', { type, title, message: notificationMessage });
+    }).catch(error => {
+      logger.warn('Failed to subscribe to notifications:', error);
+    });
 
-  // Member updates
-  kafkaService.subscribe(KafkaTopics.MEMBER_UPDATES, async (message) => {
-    const { type, networkId, userId, data } = message;
-    if (type === 'member:join') {
-      emitToNetwork(networkId, 'member:join', { userId, ...data });
-    }
-  });
+    // Member updates
+    kafkaService.subscribe(KafkaTopics.MEMBER_UPDATES, async (message) => {
+      const { type, networkId, userId, data } = message;
+      if (type === 'member:join') {
+        emitToNetwork(networkId, 'member:join', { userId, ...data });
+      }
+    }).catch(error => {
+      logger.warn('Failed to subscribe to member updates:', error);
+    });
 
-  // User activity updates
-  kafkaService.subscribe(KafkaTopics.USER_ACTIVITY, async (message) => {
-    const { type, userId, data } = message;
-    emitToUser(userId, `user:${type}`, data);
-  });
+    // User activity updates
+    kafkaService.subscribe(KafkaTopics.USER_ACTIVITY, async (message) => {
+      const { type, userId, data } = message;
+      emitToUser(userId, `user:${type}`, data);
+    }).catch(error => {
+      logger.warn('Failed to subscribe to user activity:', error);
+    });
+  } catch (error) {
+    logger.error('Failed to initialize Kafka subscriptions:', error);
+  }
 }
 
 async function checkUserNetworkRole(userId: string, networkId: string, role: string): Promise<boolean> {

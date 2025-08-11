@@ -71,7 +71,6 @@ export class NetworkSearchSocket {
         (n.name ILIKE ${'%' + term + '%'}
         OR n.tag_name ILIKE ${'%' + term + '%'}
         OR n.description ILIKE ${'%' + term + '%'})
-        AND n.is_deleted = false
       GROUP BY n.id
       ORDER BY n.created_at DESC
       LIMIT 20
@@ -87,7 +86,6 @@ export class NetworkSearchSocket {
       LEFT JOIN network_members nm ON nm.network_id = n.id
       WHERE 
         n.tag_name = ${tagName}
-        AND n.is_deleted = false
       GROUP BY n.id
     `;
   }
