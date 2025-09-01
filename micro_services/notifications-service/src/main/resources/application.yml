@@ -1,0 +1,10 @@
+spring:
+  config:
+    import: optional:configserver:${CONFIGURATION-SERVER:http://localhost:8081}
+  application:
+    name: notification-service
+
+kafka-setup:
+  url: ${KAFKA_URL:localhost:9092}
+app:
+  firebase-configuration-file: snapearn.json
