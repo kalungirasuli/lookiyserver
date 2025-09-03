@@ -345,280 +345,124 @@ def remove_user_from_faiss(user_id: str) -> bool:
         logger.error(f"Error removing user {user_id} from FAISS: {e}")
         return False
 
-# API Endpoints
-
-@app.post("/register")
-def register_user(request: UserRegistrationRequest):
-    """Register user and store in Postgres + FAISS"""
-    try:
-        user_id = request.user_id
-        profile_data = request.profile_data
-        
-        # Create user profile from data
-        user_profile = UserProfile(
-            id=user_id,
-            name=profile_data.get('name', ''),
-            bio=profile_data.get('bio'),
-            skills=profile_data.get('skills', []),
-            interests=profile_data.get('interests', []),
-            experience=profile_data.get('experience'),
-            goals=profile_data.get('goals', [])
-        )
-        
-        # Generate profile text and embedding
-        profile_text = create_profile_text(user_profile)
-        embedding = generate_embedding(profile_text)
-        
-        # Add to FAISS
-        success = add_user_to_faiss(user_id, embedding)
-        
-        if success:
-            return {
-                "status": "success",
-                "message": f"User {user_id} registered successfully",
-                "embedding_dim": len(embedding)
-            }
-        else:
-            raise HTTPException(status_code=500, detail="Failed to add user to FAISS index")
-            
-    except Exception as e:
-        logger.error(f"Error registering user {request.user_id}: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.post("/recommendations/{user_id}")
-def get_recommendations(user_id: str, top_n: int = 10, network_filter: Optional[str] = None):
-    """Get FAISS-based recommendations for a user"""
-    try:
-        # Query FAISS for similar users
-        similar_users = query_faiss(user_id, top_n, network_filter)
-        
-        if not similar_users:
-            return {
-                "user_id": user_id,
-                "recommendations": [],
-                "total": 0,
-                "message": "No similar users found"
-            }
-        
-        # Format recommendations
-        recommendations = []
-        for user_data in similar_users:
-            recommendations.append({
-                "user_id": user_data['user_id'],
-                "match_score": user_data['similarity_score'],
-                "rank": user_data['rank'],
-                "explanation": f"High similarity match (score: {user_data['similarity_score']:.3f})"
-            })
-        
-        return {
-            "user_id": user_id,
-            "recommendations": recommendations,
-            "total": len(recommendations),
-            "algorithm": "FAISS + Gemini Embeddings"
-        }
-        
-    except Exception as e:
-        logger.error(f"Error getting recommendations for user {user_id}: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.post("/network/register")
-def register_network(request: NetworkEmbeddingRequest):
-    """Register network and generate embeddings"""
-    try:
-        network_id = request.network_id
-        network_data = request.network_data
-        
-        # Generate network text and embedding
-        network_text = create_network_text(network_data)
-        embedding = generate_embedding(network_text)
-        
-        # Add to FAISS
-        success = add_network_to_faiss(network_id, embedding)
-        
-        if success:
-            return {
-                "status": "success",
-                "message": f"Network {network_id} registered successfully",
-                "embedding_dim": len(embedding)
-            }
-        else:
-            raise HTTPException(status_code=500, detail="Failed to add network to FAISS index")
-            
-    except Exception as e:
-        logger.error(f"Error registering network {request.network_id}: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.delete("/user/{user_id}")
-def delete_user(user_id: str):
-    """Remove user from FAISS index"""
-    try:
-        success = remove_user_from_faiss(user_id)
-        
-        if success:
-            return {
-                "status": "success",
-                "message": f"User {user_id} removed from FAISS index"
-            }
-        else:
-            return {
-                "status": "warning",
-                "message": f"User {user_id} not found in FAISS index"
-            }
-            
-    except Exception as e:
-        logger.error(f"Error removing user {user_id}: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.post("/faiss/rebuild")
-def rebuild_faiss_index():
-    """Rebuild FAISS index for better efficiency"""
-    try:
-        # This is a placeholder for weekly rebalancing
-        # In production, this would rebuild the index from scratch
-        faiss_manager.save_indices()
-        
-        return {
-            "status": "success",
-            "message": "FAISS index rebuilt successfully",
-            "user_count": faiss_manager.user_index.ntotal,
-            "network_count": faiss_manager.network_index.ntotal
-        }
-        
-    except Exception as e:
-        logger.error(f"Error rebuilding FAISS index: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-# Legacy endpoints for backward compatibility
+# Job matching endpoint
 @app.post("/match")
 def match(input: MatchInput):
-    """Legacy job matching endpoint - now uses Gemini embeddings"""
-    try:
-        # Generate embeddings for resume and job description
-        resume_embedding = generate_embedding(input.resume)
-        job_embedding = generate_embedding(input.job_description)
-        
-        # Calculate cosine similarity
-        similarity = np.dot(resume_embedding, job_embedding)
-        
-        # Normalize to 0-1 range
-        match_score = (similarity + 1) / 2
-        
-        return {
-            "match_score": float(match_score),
-            "confidence": "high" if match_score > 0.7 else "medium" if match_score > 0.4 else "low",
-            "algorithm": "Gemini Embeddings + Cosine Similarity"
-        }
-    except Exception as e:
-        logger.error(f"Error in job matching: {e}")
-        return {"error": str(e)}
+    resume_vec = encoder.encode(input.resume, convert_to_numpy=True)
+    job_vec = encoder.encode(input.job_description, convert_to_numpy=True)
+    
+    if use_neural_model:
+        # Use neural network model
+        combined = np.concatenate([resume_vec, job_vec])
+        tensor = torch.tensor(combined, dtype=torch.float32).unsqueeze(0)
+        with torch.no_grad():
+            score = model(tensor).item()
+    else:
+        # Use cosine similarity
+        score = cosine_similarity([resume_vec], [job_vec])[0][0]
+    
+    return {"match_score": round(float(score), 4)}
 
+# User recommendation endpoint
 @app.post("/recommend")
 def recommend(request: RecommendationRequest) -> RecommendationResponse:
-    """Legacy recommendation endpoint - now uses FAISS + Gemini"""
-    try:
-        user_profile = request.user_profile
-        candidate_profiles = request.candidate_profiles
-        network_context = request.network_context
-        
-        # Generate user embedding
-        user_text = create_profile_text(user_profile, network_context)
-        user_embedding = generate_embedding(user_text)
-        
-        recommendations = []
-        
-        for candidate in candidate_profiles:
-            # Generate candidate embedding
-            candidate_text = create_profile_text(candidate, network_context)
-            candidate_embedding = generate_embedding(candidate_text)
-            
-            # Calculate similarity
-            similarity = np.dot(user_embedding, candidate_embedding)
-            match_score = (similarity + 1) / 2  # Normalize to 0-1 range
-            
-            # Generate explanation
-            explanation = generate_explanation(user_profile, candidate, match_score)
-            
-            recommendations.append({
-                "user_id": candidate.id,
-                "match_score": float(match_score),
-                "explanation": explanation
-            })
-        
-        # Sort by match score (descending)
-        recommendations.sort(key=lambda x: x["match_score"], reverse=True)
-        
-        return RecommendationResponse(recommendations=recommendations)
+    """
+    Generate user recommendations based on profile similarity
+    """
+    user_profile = request.user_profile
+    candidates = request.candidate_profiles
+    network_context = request.network_context
     
-    except Exception as e:
-        logger.error(f"Error in recommendation: {e}")
+    if not candidates:
         return RecommendationResponse(recommendations=[])
+    
+    # Create user profile text
+    user_text = create_profile_text(user_profile, network_context)
+    user_embedding = encoder.encode(user_text, convert_to_numpy=True)
+    
+    recommendations = []
+    
+    for candidate in candidates:
+        # Create candidate profile text
+        candidate_text = create_profile_text(candidate, network_context)
+        candidate_embedding = encoder.encode(candidate_text, convert_to_numpy=True)
+        
+        # Calculate similarity
+        if use_neural_model:
+            # Use neural network for more sophisticated matching
+            combined = np.concatenate([user_embedding, candidate_embedding])
+            tensor = torch.tensor(combined, dtype=torch.float32).unsqueeze(0)
+            with torch.no_grad():
+                match_score = model(tensor).item()
+        else:
+            # Use cosine similarity
+            match_score = cosine_similarity([user_embedding], [candidate_embedding])[0][0]
+        
+        recommendations.append({
+            "user_id": candidate.id,
+            "match_score": round(float(match_score), 4),
+            "explanation": generate_explanation(user_profile, candidate, match_score)
+        })
+    
+    # Sort by match score (highest first)
+    recommendations.sort(key=lambda x: x["match_score"], reverse=True)
+    
+    return RecommendationResponse(recommendations=recommendations)
+
+def create_profile_text(profile: UserProfile, network_context: Optional[NetworkContext] = None) -> str:
+    """
+    Create a comprehensive text representation of a user profile
+    """
+    text_parts = []
+    
+    # Basic info
+    text_parts.append(f"Name: {profile.name}")
+    
+    if profile.bio:
+        text_parts.append(f"Bio: {profile.bio}")
+    
+    if profile.experience:
+        text_parts.append(f"Experience: {profile.experience}")
+    
+    # Skills
+    if profile.skills:
+        text_parts.append(f"Skills: {', '.join(profile.skills)}")
+    
+    # Interests
+    if profile.interests:
+        text_parts.append(f"Interests: {', '.join(profile.interests)}")
+    
+    # Goals
+    if profile.goals:
+        text_parts.append(f"Goals: {', '.join(profile.goals)}")
+    
+    # Network context
+    if network_context:
+        text_parts.append(f"Network: {network_context.name}")
+        if network_context.description:
+            text_parts.append(f"Network Description: {network_context.description}")
+        if network_context.goals:
+            text_parts.append(f"Network Goals: {', '.join(network_context.goals)}")
+    
+    return " ".join(text_parts)
 
 def generate_explanation(user: UserProfile, candidate: UserProfile, score: float) -> str:
-    """Generate explanation for match score"""
-    explanations = []
-    
-    # Check skill overlap
-    if user.skills and candidate.skills:
-        common_skills = set(user.skills) & set(candidate.skills)
-        if common_skills:
-            explanations.append(f"Shared skills: {', '.join(list(common_skills)[:3])}")
-    
-    # Check interest overlap
-    if user.interests and candidate.interests:
-        common_interests = set(user.interests) & set(candidate.interests)
-        if common_interests:
-            explanations.append(f"Common interests: {', '.join(list(common_interests)[:3])}")
-    
-    # Check goal alignment
-    if user.goals and candidate.goals:
-        common_goals = set(user.goals) & set(candidate.goals)
-        if common_goals:
-            explanations.append(f"Aligned goals: {', '.join(list(common_goals)[:2])}")
-    
-    if not explanations:
-        if score > 0.7:
-            explanations.append("Strong profile compatibility via AI embeddings")
-        elif score > 0.4:
-            explanations.append("Moderate profile compatibility via AI embeddings")
-        else:
-            explanations.append("Basic profile compatibility via AI embeddings")
-    
-    return "; ".join(explanations)
+    """
+    Generate a simple explanation for the match
+    """
+    if score > 0.8:
+        return "Excellent match based on shared interests and goals"
+    elif score > 0.6:
+        return "Good match with complementary skills and interests"
+    elif score > 0.4:
+        return "Moderate match with some shared interests"
+    else:
+        return "Basic compatibility"
 
 @app.get("/health")
 def health_check():
-    """Health check endpoint"""
-    try:
-        # Test Gemini API
-        test_embedding = generate_embedding("test")
-        gemini_status = len(test_embedding) == EMBEDDING_DIM
-    except:
-        gemini_status = False
-    
     return {
-        "status": "healthy" if gemini_status else "degraded",
-        "gemini_api": gemini_status,
-        "faiss_users": faiss_manager.user_index.ntotal,
-        "faiss_networks": faiss_manager.network_index.ntotal,
-        "embedding_dim": EMBEDDING_DIM,
-        "algorithm": "FAISS + Gemini Embeddings"
+        "status": "healthy",
+        "model_loaded": use_neural_model,
+        "encoder_loaded": encoder is not None
     }
-
-@app.get("/stats")
-def get_stats():
-    """Get FAISS index statistics"""
-    return {
-        "user_count": faiss_manager.user_index.ntotal,
-        "network_count": faiss_manager.network_index.ntotal,
-        "embedding_dimension": EMBEDDING_DIM,
-        "index_type": "IndexFlatIP",
-        "algorithm": "FAISS + Gemini Embeddings"
-    }
-
-# Cleanup function to save indices on shutdown
-@app.on_event("shutdown")
-def shutdown_event():
-    """Save FAISS indices on shutdown"""
-    logger.info("Saving FAISS indices before shutdown...")
-    faiss_manager.save_indices()
-    logger.info("FAISS indices saved successfully")
