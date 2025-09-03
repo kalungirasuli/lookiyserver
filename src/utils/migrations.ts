@@ -18,9 +18,16 @@ export async function createTables() {
         avatar TEXT,
         isVerified BOOLEAN DEFAULT FALSE,
         isPublic BOOLEAN DEFAULT FALSE,
+        connection_request_privacy VARCHAR(20) DEFAULT 'network_only',
         createdAt TIMESTAMP DEFAULT now(),
         updatedAt TIMESTAMP DEFAULT now()
       )
+    `;
+
+    // Add connection_request_privacy column if it doesn't exist
+    await sql`
+      ALTER TABLE users 
+      ADD COLUMN IF NOT EXISTS connection_request_privacy VARCHAR(20) DEFAULT 'network_only'
     `;
 
     // Networks table
@@ -36,7 +43,12 @@ export async function createTables() {
         approval_mode VARCHAR(50) NOT NULL DEFAULT 'manual',
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-        last_passcode_update TIMESTAMP WITH TIME ZONE
+        last_passcode_update TIMESTAMP WITH TIME ZONE,
+        suspension_status VARCHAR(20) DEFAULT 'active',
+        suspended_at TIMESTAMP WITH TIME ZONE,
+        suspended_by UUID REFERENCES users(id),
+        suspension_token UUID,
+        suspension_expires_at TIMESTAMP WITH TIME ZONE
       )
     `;
 
@@ -58,10 +70,13 @@ export async function createTables() {
         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         from_user_id UUID REFERENCES users(id) ON DELETE CASCADE,
         to_user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+        network_id UUID REFERENCES networks(id) ON DELETE CASCADE,
+        message TEXT,
         status VARCHAR(50) DEFAULT 'pending',
+        responded_at TIMESTAMP WITH TIME ZONE,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE(from_user_id, to_user_id)
+        UNIQUE(from_user_id, to_user_id, network_id)
       )
     `;
 
@@ -71,8 +86,11 @@ export async function createTables() {
         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         user_id_1 UUID REFERENCES users(id) ON DELETE CASCADE,
         user_id_2 UUID REFERENCES users(id) ON DELETE CASCADE,
+        network_id UUID REFERENCES networks(id) ON DELETE SET NULL,
+        saved BOOLEAN DEFAULT FALSE,
         connected_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE(user_id_1, user_id_2)
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id_1, user_id_2, network_id)
       )
     `;
 
@@ -263,7 +281,34 @@ export async function createTables() {
       )
     `;
 
-   
+    // User recommendations table
+    await sql`
+      CREATE TABLE IF NOT EXISTS user_recommendations (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+        recommended_user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+        network_id UUID REFERENCES networks(id) ON DELETE CASCADE,
+        match_score DECIMAL(5,4) NOT NULL,
+        is_served BOOLEAN DEFAULT FALSE,
+        served_at TIMESTAMP WITH TIME ZONE,
+        is_acted_upon BOOLEAN DEFAULT FALSE,
+        acted_upon_at TIMESTAMP WITH TIME ZONE,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id, recommended_user_id, network_id)
+      )
+    `;
+
+    // Create indexes for better performance
+    await sql`
+      CREATE INDEX IF NOT EXISTS idx_user_recommendations_user_network 
+      ON user_recommendations(user_id, network_id, is_served)
+    `;
+
+    await sql`
+      CREATE INDEX IF NOT EXISTS idx_user_recommendations_score 
+      ON user_recommendations(network_id, match_score DESC)
+    `;
 
     logger.info('All database tables created successfully');
   } catch (error) {

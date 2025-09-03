@@ -1,8 +1,9 @@
 fastapi
 uvicorn
-torch
-sentence-transformers
 numpy
 joblib
 pydantic
-scikit-learn
+faiss-cpu
+google-generativeai
+psycopg2-binary
+sqlalchemy

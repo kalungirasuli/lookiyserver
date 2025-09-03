@@ -13,6 +13,7 @@ export interface User extends BaseModel {
   avatar?: string;
   isverified: boolean;
   isPublic: boolean;
+  connection_request_privacy: 'public' | 'network_only' | 'verified_only' | 'none';
   deletion_requested_at?: Date;
   account_status: 'active' | 'deleted' | 'pending_deletion';
 }
@@ -36,6 +37,11 @@ export interface Network extends BaseModel {
   approval_mode: 'manual' | 'passcode' | 'auto';
   avatar?: string;
   member_count?: number;  // Adding member count from SQL query
+  suspension_status: 'active' | 'temporarily_suspended' | 'permanently_suspended';
+  suspended_at?: Date;
+  suspended_by?: string;
+  suspension_token?: string;
+  suspension_expires_at?: Date;
 }
 
 export interface NetworkMember extends BaseModel {
@@ -48,12 +54,17 @@ export interface NetworkMember extends BaseModel {
 export interface ConnectionRequest extends BaseModel {
   from_user_id: string;
   to_user_id: string;
+  network_id: string;
+  message?: string;
   status: 'pending' | 'accepted' | 'rejected';
+  responded_at?: Date;
 }
 
 export interface Connection extends BaseModel {
   user_id_1: string;
   user_id_2: string;
+  network_id?: string;
+  saved: boolean;
   connected_at: Date;
 }
 
@@ -135,4 +146,26 @@ export interface PendingNetworkJoin extends BaseModel {
   user_id: string;
   status: 'pending' | 'approved' | 'rejected';
   passcode_attempt?: string;
+}
+
+export interface UserRecommendation extends BaseModel {
+  user_id: string;
+  recommended_user_id: string;
+  network_id: string;
+  match_score: number;
+  is_served: boolean;
+  served_at?: Date;
+  is_acted_upon: boolean;
+  acted_upon_at?: Date;
+}
+
+export interface RecommendationCache {
+  user_id: string;
+  network_id: string;
+  recommendations: {
+    user_id: string;
+    match_score: number;
+    cached_at: Date;
+  }[];
+  last_updated: Date;
 }

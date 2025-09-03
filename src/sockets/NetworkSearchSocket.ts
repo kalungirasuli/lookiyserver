@@ -86,6 +86,7 @@ export class NetworkSearchSocket {
       LEFT JOIN network_members nm ON nm.network_id = n.id
       WHERE 
         n.tag_name = ${tagName}
+        AND n.is_deleted = false
       GROUP BY n.id
     `;
   }
