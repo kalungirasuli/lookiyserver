@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "drillox-apps",
+  "private_key_id": "69a8f38d23c12e55e815a4a17e8e880f46fff3f3",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDEHGLQusGmhVDq\nHXnDW+2zv+424LbB8mFRwqWIkO9IeoEux5gdeO1/bx/S+VdPMsIy1Dqxo4+WYJiL\nO9aP+RF9pnN0vnW9WD5bhNMmaPh7t4QvDJ6wOMXvn3IX03nqJWfi4z0mgGlDRDxT\nW4Do58OMEZt5GGu+Y0Wl/bj1YVIIpPe8ATrW8kldOx0UHczf1ZsCUSX+nQQiFT25\nYu1jqZnfwOJ4PemhQxkbUF0mYcVIYnhmUl+ZjxLi/COsuibvG2/EX2r7dyqudx6z\ntNeToDFgMB97xhUR3C8t4j9BNooFpNh5XqbqMkSKEwhWQ14dnK1C4GdruOHA1C5o\nITH7G53HAgMBAAECggEAWNHKZ2LOJg8nUIE9Dp/qDokU6MHpw/l03kTcF/gch6UE\nMR2w5VhJqHe54CGRy4rfrYm1c5Lyi1cAf78ANIDHzTLAA9XnGXSH+Yc04qaUM+Qv\n9+ctT/7GlvqOAACFrOh4Hqhwn6l1A0Q6Vj6RKeseA6hN1BCda8MmXkGFrY0ATG0u\nm6+/4quPnEPlBn0ytZwe7NACapJ2xxUhx0c4Pg8DuK8UZYv5THVy1gXxmyaYDecC\nj4kz20hmPeibFoMIKnyHmVh6d76tLCQotCjLZ1hmJHAK6y/nw5oKJ1sdoM3Md72r\npZ1TJdhLnwy5YgOFlCXvvOpPBrRwao6kE1FPB4dWoQKBgQDIqA9+OP3GYTn1Zc1w\ny/lhRhkOgDcMGcHRERT2ezpNOue6l9M0p23fzPv7r0iNkyXSwTMOpmU7zxIjwS+U\nNefx/Qrse9okGMMLGDQ2kdMueeyNNwSG4QOc/QbnwgIR2rbbOSok4iIrBScGhBv2\nvAs9OOIMPDjmmTNvzXxeRczvmQKBgQD6M16rz/da+/lqhPtuFD/1JKO8QY07/9/Y\nZPQvVlrlJkOyWa19YINHCohFPE95Y8rzl0F5uThZ4NBOe2JKKK3BT8F6aI7j9Tyr\nDi55KNIn9iHEkyXjPDKmbgM7Pi3i6WFb+VpdMZZXCWC/gebBlOgm5M2gd9Ts3RVq\nL3GGIUTUXwKBgQC2Z9BttfE8PXYqlnjDaSkyPD7a58MixOdj3ltoFW1Sd5HgFdRx\nsSI4qGcIzLbvvCxOAkMftjOgwwSCbEOMP9SyLo2XnJ8Y4Ums9DvCv51ySnO3i6QZ\n2MMoGvwEAmFPSbugXb7p+IeHBBAN5FpnWVn+NY+H/9baCbqwj+PW7yz1QQKBgCSp\nUE72qzUOxO5BzCHGH9UI6GEWbd6D0MYBjPI+whTftX21vEEp2jKXrX4Pp0mPQNbO\nrA5tAH/S/FLzq2RYb5Vq3VvVZFKsxZX+/vpL6/dlDm+ibCPO11Ehv6F3q/ua3ORA\nNmh/cpsQSbfmDe0Bp77DOgowZOfMQW4Mw6K2z0IbAoGAK+jPt3zkFVE/Z+81q5b1\nEA6fRKiMovDc1VDURIi67S5xZc6TQSmXx6bsILHLfBKz5HvgWF23pO1aJcC+shY0\n3QxhbKC5xaHYxPyqrJANCpnQWy0PJGKDmHuRodRBES3YXcv9QMOBRLuoV+E/QfUw\nzKPaANZflZNs59yBazTnYMY=\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-7k97s@drillox-apps.iam.gserviceaccount.com",
+  "client_id": "103376513266749432705",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-7k97s%40drillox-apps.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
