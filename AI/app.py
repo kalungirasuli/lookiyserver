@@ -13,6 +13,12 @@ from datetime import datetime
 import asyncio
 import threading
 import time
+from sklearn.metrics.pairwise import cosine_similarity
+import torch
+import torch.nn as nn
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -44,25 +50,24 @@ class FAISSManager:
         self.idx_to_user_id = {}
         self.network_id_to_idx = {}
         self.idx_to_network_id = {}
-        self.lock = threading.Lock()
-        self.initialize_indices()
+        self.lock = asyncio.Lock()
     
-    def initialize_indices(self):
+    async def initialize_indices(self):
         """Initialize FAISS indices and load existing data"""
         try:
             # Initialize user index
-            self.user_index = faiss.IndexFlatIP(EMBEDDING_DIM)  # Inner product for cosine similarity
+            self.user_index = await asyncio.to_thread(faiss.IndexFlatIP, EMBEDDING_DIM)  # Inner product for cosine similarity
             
             # Initialize network index
-            self.network_index = faiss.IndexFlatIP(EMBEDDING_DIM)
+            self.network_index = await asyncio.to_thread(faiss.IndexFlatIP, EMBEDDING_DIM)
             
             # Load existing indices if they exist
             if os.path.exists(FAISS_INDEX_PATH + "_users"):
-                self.user_index = faiss.read_index(FAISS_INDEX_PATH + "_users")
+                self.user_index = await asyncio.to_thread(faiss.read_index, FAISS_INDEX_PATH + "_users")
                 logger.info(f"Loaded existing user FAISS index with {self.user_index.ntotal} vectors")
             
             if os.path.exists(FAISS_INDEX_PATH + "_networks"):
-                self.network_index = faiss.read_index(FAISS_INDEX_PATH + "_networks")
+                self.network_index = await asyncio.to_thread(faiss.read_index, FAISS_INDEX_PATH + "_networks")
                 logger.info(f"Loaded existing network FAISS index with {self.network_index.ntotal} vectors")
             
             # Load mappings
@@ -85,16 +90,16 @@ class FAISSManager:
         except Exception as e:
             logger.error(f"Error initializing FAISS indices: {e}")
             # Fallback to empty indices
-            self.user_index = faiss.IndexFlatIP(EMBEDDING_DIM)
-            self.network_index = faiss.IndexFlatIP(EMBEDDING_DIM)
+            self.user_index = await asyncio.to_thread(faiss.IndexFlatIP, EMBEDDING_DIM)
+            self.network_index = await asyncio.to_thread(faiss.IndexFlatIP, EMBEDDING_DIM)
     
-    def save_indices(self):
+    async def save_indices(self):
         """Save FAISS indices and mappings to disk"""
         try:
-            with self.lock:
+            async with self.lock:
                 # Save indices
-                faiss.write_index(self.user_index, FAISS_INDEX_PATH + "_users")
-                faiss.write_index(self.network_index, FAISS_INDEX_PATH + "_networks")
+                await asyncio.to_thread(faiss.write_index, self.user_index, FAISS_INDEX_PATH + "_users")
+                await asyncio.to_thread(faiss.write_index, self.network_index, FAISS_INDEX_PATH + "_networks")
                 
                 # Save user mappings
                 user_mapping_data = {
@@ -120,21 +125,29 @@ class FAISSManager:
 faiss_manager = FAISSManager()
 
 # FastAPI instance
-app = FastAPI(title="AI Recommendation Engine with FAISS + Gemini")
+app = FastAPI(title="AI User Matching Engine with FAISS + Gemini")
+
+@app.on_event("startup")
+async def startup_event():
+    await faiss_manager.initialize_indices()
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    await faiss_manager.save_indices()
+
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy"}
 
 # Input schemas
 # Data Models
-class MatchInput(BaseModel):
-    resume: str
-    job_description: str
+# Removed MatchInput - this system is for user matching only, not job matching
 
 class UserProfile(BaseModel):
     id: str
     name: str
     bio: Optional[str] = None
-    skills: Optional[List[str]] = []
     interests: Optional[List[str]] = []
-    experience: Optional[str] = None
     goals: Optional[List[str]] = []
 
 class NetworkContext(BaseModel):
@@ -172,16 +185,66 @@ class UserRegistrationRequest(BaseModel):
 def generate_embedding(text: str) -> np.ndarray:
     """Generate Gemini embedding for given text"""
     try:
-        model = genai.GenerativeModel('models/embedding-001')
-        result = model.embed_content(text)
+        # Use the correct Gemini embedding API
+        result = genai.embed_content(
+            model="models/embedding-001",
+            content=text,
+            task_type="retrieval_document"
+        )
         embedding = np.array(result['embedding'], dtype=np.float32)
         # Normalize for cosine similarity
         embedding = embedding / np.linalg.norm(embedding)
+        logger.info(f"Generated embedding with shape: {embedding.shape}")
         return embedding
     except Exception as e:
         logger.error(f"Error generating embedding: {e}")
         # Fallback to random embedding (should not happen in production)
-        return np.random.random(EMBEDDING_DIM).astype(np.float32)
+        fallback = np.random.random(EMBEDDING_DIM).astype(np.float32)
+        fallback = fallback / np.linalg.norm(fallback)
+        return fallback
+
+def enhance_compatibility_score(user: UserProfile, candidate: UserProfile, base_score: float, network_context: Optional[NetworkContext] = None) -> float:
+    """
+    Enhance compatibility score with additional factors
+    """
+    try:
+        enhanced_score = base_score
+        
+        # Interest overlap bonus
+        user_interests = set(user.interests or [])
+        candidate_interests = set(candidate.interests or [])
+        if user_interests and candidate_interests:
+            overlap = len(user_interests.intersection(candidate_interests))
+            total_interests = len(user_interests.union(candidate_interests))
+            if total_interests > 0:
+                interest_bonus = (overlap / total_interests) * 0.1
+                enhanced_score += interest_bonus
+        
+        # Goal alignment bonus
+        user_goals = set(user.goals or [])
+        candidate_goals = set(candidate.goals or [])
+        if user_goals and candidate_goals:
+            goal_overlap = len(user_goals.intersection(candidate_goals))
+            total_goals = len(user_goals.union(candidate_goals))
+            if total_goals > 0:
+                goal_bonus = (goal_overlap / total_goals) * 0.15
+                enhanced_score += goal_bonus
+        
+        # Network context bonus
+        if network_context and network_context.goals:
+            network_goals = set(network_context.goals)
+            user_network_alignment = len(user_goals.intersection(network_goals)) if user_goals else 0
+            candidate_network_alignment = len(candidate_goals.intersection(network_goals)) if candidate_goals else 0
+            
+            if user_network_alignment > 0 and candidate_network_alignment > 0:
+                network_bonus = min(user_network_alignment, candidate_network_alignment) * 0.05
+                enhanced_score += network_bonus
+        
+        # Ensure score stays within reasonable bounds
+        return min(enhanced_score, 1.0)
+    except Exception as e:
+        logger.error(f"Error enhancing compatibility score: {e}")
+        return base_score
 
 def create_profile_text(profile: UserProfile, network_context: Optional[NetworkContext] = None) -> str:
     """Convert user profile to text for embedding generation"""
@@ -193,14 +256,10 @@ def create_profile_text(profile: UserProfile, network_context: Optional[NetworkC
     if profile.bio:
         text_parts.append(f"Bio: {profile.bio}")
     
-    if profile.skills:
-        text_parts.append(f"Skills: {', '.join(profile.skills)}")
+
     
     if profile.interests:
         text_parts.append(f"Interests: {', '.join(profile.interests)}")
-    
-    if profile.experience:
-        text_parts.append(f"Experience: {profile.experience}")
     
     if profile.goals:
         text_parts.append(f"Goals: {', '.join(profile.goals)}")
@@ -239,56 +298,43 @@ def create_network_text(network_data: Dict[str, Any]) -> str:
     
     return " | ".join(text_parts)
 
-def add_user_to_faiss(user_id: str, embedding: np.ndarray) -> bool:
+async def add_user_to_faiss(user_id: str, embedding: np.ndarray) -> bool:
     """Add user embedding to FAISS index"""
     try:
-        with faiss_manager.lock:
+        async with faiss_manager.lock:
             # Check if user already exists
             if user_id in faiss_manager.user_id_to_idx:
-                # Update existing user
-                idx = faiss_manager.user_id_to_idx[user_id]
-                # FAISS doesn't support direct updates, so we need to rebuild
-                # For now, we'll remove and re-add
-                logger.info(f"User {user_id} already exists in FAISS, will be updated on next rebuild")
+                logger.info(f"User {user_id} already exists in FAISS, skipping.")
                 return True
-            
+
             # Add new user
             idx = faiss_manager.user_index.ntotal
-            faiss_manager.user_index.add(embedding.reshape(1, -1))
+            await asyncio.to_thread(faiss_manager.user_index.add, embedding.reshape(1, -1))
             faiss_manager.user_id_to_idx[user_id] = idx
             faiss_manager.idx_to_user_id[idx] = user_id
-            
-            # Save indices periodically
-            if idx % 100 == 0:  # Save every 100 additions
-                faiss_manager.save_indices()
-            
+
             logger.info(f"Added user {user_id} to FAISS index at position {idx}")
             return True
     except Exception as e:
         logger.error(f"Error adding user {user_id} to FAISS: {e}")
         return False
 
-def add_network_to_faiss(network_id: str, embedding: np.ndarray) -> bool:
+
+async def add_network_to_faiss(network_id: str, embedding: np.ndarray) -> bool:
     """Add network embedding to FAISS index"""
     try:
-        with faiss_manager.lock:
+        async with faiss_manager.lock:
             # Check if network already exists
             if network_id in faiss_manager.network_id_to_idx:
-                # Update existing network
-                idx = faiss_manager.network_id_to_idx[network_id]
-                logger.info(f"Network {network_id} already exists in FAISS, will be updated on next rebuild")
+                logger.info(f"Network {network_id} already exists in FAISS, skipping.")
                 return True
-            
+
             # Add new network
             idx = faiss_manager.network_index.ntotal
-            faiss_manager.network_index.add(embedding.reshape(1, -1))
+            await asyncio.to_thread(faiss_manager.network_index.add, embedding.reshape(1, -1))
             faiss_manager.network_id_to_idx[network_id] = idx
             faiss_manager.idx_to_network_id[idx] = network_id
-            
-            # Save indices periodically
-            if idx % 50 == 0:  # Save every 50 additions
-                faiss_manager.save_indices()
-            
+
             logger.info(f"Added network {network_id} to FAISS index at position {idx}")
             return True
     except Exception as e:
@@ -345,69 +391,70 @@ def remove_user_from_faiss(user_id: str) -> bool:
         logger.error(f"Error removing user {user_id} from FAISS: {e}")
         return False
 
-# Job matching endpoint
-@app.post("/match")
-def match(input: MatchInput):
-    resume_vec = encoder.encode(input.resume, convert_to_numpy=True)
-    job_vec = encoder.encode(input.job_description, convert_to_numpy=True)
-    
-    if use_neural_model:
-        # Use neural network model
-        combined = np.concatenate([resume_vec, job_vec])
-        tensor = torch.tensor(combined, dtype=torch.float32).unsqueeze(0)
-        with torch.no_grad():
-            score = model(tensor).item()
-    else:
-        # Use cosine similarity
-        score = cosine_similarity([resume_vec], [job_vec])[0][0]
-    
-    return {"match_score": round(float(score), 4)}
-
+# User matching and recommendation endpoints
 # User recommendation endpoint
-@app.post("/recommend")
-def recommend(request: RecommendationRequest) -> RecommendationResponse:
+@app.post("/recommend", response_model=RecommendationResponse)
+async def recommend(request: RecommendationRequest):
     """
-    Generate user recommendations based on profile similarity
+    Receives a user profile and a list of candidate profiles,
+    and returns a ranked list of recommended candidates based on compatibility.
     """
+    logger.info("Received recommendation request")
     user_profile = request.user_profile
-    candidates = request.candidate_profiles
+    candidate_profiles = request.candidate_profiles
     network_context = request.network_context
     
-    if not candidates:
-        return RecommendationResponse(recommendations=[])
-    
-    # Create user profile text
-    user_text = create_profile_text(user_profile, network_context)
-    user_embedding = encoder.encode(user_text, convert_to_numpy=True)
-    
-    recommendations = []
-    
-    for candidate in candidates:
-        # Create candidate profile text
-        candidate_text = create_profile_text(candidate, network_context)
-        candidate_embedding = encoder.encode(candidate_text, convert_to_numpy=True)
+    logger.info(f"User profile: {user_profile.id}, Number of candidates: {len(candidate_profiles)}")
+
+    try:
+        # Generate embedding for the user profile
+        logger.info("Generating embedding for user profile...")
+        user_text = create_profile_text(user_profile, network_context)
+        user_embedding = await asyncio.to_thread(generate_embedding, user_text)
+        logger.info("User profile embedding generated successfully")
+
+        # Generate embeddings for candidate profiles in parallel
+        logger.info("Generating embeddings for candidate profiles...")
         
-        # Calculate similarity
-        if use_neural_model:
-            # Use neural network for more sophisticated matching
-            combined = np.concatenate([user_embedding, candidate_embedding])
-            tensor = torch.tensor(combined, dtype=torch.float32).unsqueeze(0)
-            with torch.no_grad():
-                match_score = model(tensor).item()
-        else:
-            # Use cosine similarity
-            match_score = cosine_similarity([user_embedding], [candidate_embedding])[0][0]
+        async def generate_candidate_embedding(candidate):
+            logger.info(f"Processing candidate {candidate.id}")
+            candidate_text = create_profile_text(candidate, network_context)
+            embedding = await asyncio.to_thread(generate_embedding, candidate_text)
+            logger.info(f"Finished processing candidate {candidate.id}")
+            return candidate.id, embedding
+
+        embedding_tasks = [generate_candidate_embedding(c) for c in candidate_profiles]
+        candidate_embeddings_results = await asyncio.gather(*embedding_tasks)
         
-        recommendations.append({
-            "user_id": candidate.id,
-            "match_score": round(float(match_score), 4),
-            "explanation": generate_explanation(user_profile, candidate, match_score)
-        })
-    
-    # Sort by match score (highest first)
-    recommendations.sort(key=lambda x: x["match_score"], reverse=True)
-    
-    return RecommendationResponse(recommendations=recommendations)
+        candidate_embeddings = {cand_id: emb for cand_id, emb in candidate_embeddings_results}
+        logger.info("Candidate profile embeddings generated successfully")
+
+        # Calculate cosine similarity
+        recommendations = []
+        for cand_id, cand_embedding in candidate_embeddings.items():
+            candidate_profile = next((c for c in candidate_profiles if c.id == cand_id), None)
+            if candidate_profile:
+                # Cosine similarity
+                similarity = cosine_similarity(user_embedding.reshape(1, -1), cand_embedding.reshape(1, -1))[0][0]
+                
+                # Enhance score with other factors
+                enhanced_score = enhance_compatibility_score(user_profile, candidate_profile, similarity, network_context)
+                
+                recommendations.append({
+                    "user_id": cand_id,
+                    "score": float(enhanced_score),
+                    "name": candidate_profile.name,
+                    "bio": candidate_profile.bio
+                })
+
+        # Sort recommendations by score
+        recommendations.sort(key=lambda x: x["score"], reverse=True)
+
+        return RecommendationResponse(recommendations=recommendations)
+
+    except Exception as e:
+        logger.error(f"Error during recommendation: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Failed to generate recommendations")
 
 def create_profile_text(profile: UserProfile, network_context: Optional[NetworkContext] = None) -> str:
     """
@@ -420,13 +467,6 @@ def create_profile_text(profile: UserProfile, network_context: Optional[NetworkC
     
     if profile.bio:
         text_parts.append(f"Bio: {profile.bio}")
-    
-    if profile.experience:
-        text_parts.append(f"Experience: {profile.experience}")
-    
-    # Skills
-    if profile.skills:
-        text_parts.append(f"Skills: {', '.join(profile.skills)}")
     
     # Interests
     if profile.interests:
@@ -453,7 +493,7 @@ def generate_explanation(user: UserProfile, candidate: UserProfile, score: float
     if score > 0.8:
         return "Excellent match based on shared interests and goals"
     elif score > 0.6:
-        return "Good match with complementary skills and interests"
+        return "Good match with complementary interests and goals"
     elif score > 0.4:
         return "Moderate match with some shared interests"
     else:
@@ -463,6 +503,101 @@ def generate_explanation(user: UserProfile, candidate: UserProfile, score: float
 def health_check():
     return {
         "status": "healthy",
-        "model_loaded": use_neural_model,
-        "encoder_loaded": encoder is not None
+        "timestamp": datetime.now().isoformat()
     }
+
+@app.post("/add_user_embedding")
+async def add_user_embedding(request: EmbeddingRequest):
+    """
+    Add user embedding to FAISS index
+    """
+    try:
+        user_id = request.user_id
+        user_data = request.user_data
+        
+        # Create UserProfile from user_data
+        profile = UserProfile(
+            id=user_id,
+            name=user_data.get('name', ''),
+            bio=user_data.get('bio', ''),
+            interests=user_data.get('interests', []),
+            goals=user_data.get('goals', [])
+        )
+        
+        # Generate embedding
+        profile_text = create_profile_text(profile)
+        embedding = await asyncio.to_thread(generate_embedding, profile_text)
+        
+        # Add to FAISS
+        success = await add_user_to_faiss(user_id, embedding)
+        
+        return {
+            "success": success,
+            "user_id": user_id,
+            "embedding_shape": embedding.shape
+        }
+    except Exception as e:
+        logger.error(f"Error adding user embedding: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/query_similar_users")
+async def query_similar_users(request: FAISSQueryRequest):
+    """
+    Query FAISS for similar users
+    """
+    try:
+        results = query_faiss(request.user_id, request.top_n, request.network_filter)
+        return {
+            "user_id": request.user_id,
+            "similar_users": results
+        }
+    except Exception as e:
+        logger.error(f"Error querying similar users: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/remove_user_embedding/{user_id}")
+def remove_user_embedding(user_id: str):
+    """
+    Remove user embedding from FAISS index
+    """
+    try:
+        success = remove_user_from_faiss(user_id)
+        return {
+            "success": success,
+            "user_id": user_id
+        }
+    except Exception as e:
+        logger.error(f"Error removing user embedding: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/faiss_stats")
+def get_faiss_stats():
+    """
+    Get FAISS index statistics
+    """
+    try:
+        user_count = faiss_manager.user_index.ntotal if faiss_manager.user_index else 0
+        network_count = faiss_manager.network_index.ntotal if faiss_manager.network_index else 0
+        
+        return {
+            "user_embeddings_count": user_count,
+            "network_embeddings_count": network_count,
+            "embedding_dimension": EMBEDDING_DIM,
+            "user_mappings": len(faiss_manager.user_id_to_idx),
+            "network_mappings": len(faiss_manager.network_id_to_idx)
+        }
+    except Exception as e:
+        logger.error(f"Error getting FAISS stats: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/save_indices")
+async def save_indices():
+    """
+    Save the FAISS indices to disk.
+    """
+    try:
+        await faiss_manager.save_indices()
+        return {"status": "Indices saved successfully"}
+    except Exception as e:
+        logger.error(f"Error saving FAISS indices: {e}")
+        raise HTTPException(status_code=500, detail="Failed to save indices")

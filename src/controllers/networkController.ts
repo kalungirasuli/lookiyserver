@@ -599,6 +599,19 @@ export async function approveMember(
       return res.status(403).json({ message: 'Only admins and moderators can approve new members' });
     }
 
+    // Check if user is already a member
+    const existingMember = await sql<NetworkMember[]>`
+      SELECT * FROM network_members
+      WHERE network_id = ${networkId} AND user_id = ${newMemberId}
+    `;
+
+    if (existingMember.length > 0) {
+      return res.status(409).json({ 
+        message: 'User is already a member of this network',
+        member: existingMember[0]
+      });
+    }
+
     // Add the new member
     const result = await sql<NetworkMember[]>`
       INSERT INTO network_members (
@@ -639,12 +652,65 @@ export async function approveMember(
       member: result[0]
     });
   } catch (error) {
+    // Handle specific database constraint violations
+    if (error instanceof Error) {
+      // Check for duplicate key constraint violation
+      if (error.message.includes('duplicate key value violates unique constraint') && 
+          error.message.includes('network_members_network_id_user_id_key')) {
+        logger.warn('Attempted to approve user who is already a member', {
+          networkId,
+          newMemberId,
+          approverId,
+          error: error.message
+        });
+        return res.status(409).json({ 
+          message: 'User is already a member of this network',
+          error: 'DUPLICATE_MEMBER'
+        });
+      }
+      
+      // Check for foreign key constraint violations
+      if (error.message.includes('violates foreign key constraint')) {
+        if (error.message.includes('network_members_network_id_fkey')) {
+          logger.error('Invalid network ID in member approval', {
+            networkId,
+            newMemberId,
+            approverId,
+            error: error.message
+          });
+          return res.status(404).json({ 
+            message: 'Network not found',
+            error: 'NETWORK_NOT_FOUND'
+          });
+        }
+        if (error.message.includes('network_members_user_id_fkey')) {
+          logger.error('Invalid user ID in member approval', {
+            networkId,
+            newMemberId,
+            approverId,
+            error: error.message
+          });
+          return res.status(404).json({ 
+            message: 'User not found',
+            error: 'USER_NOT_FOUND'
+          });
+        }
+      }
+    }
+    
+    // Log the full error for debugging
     logger.error('Failed to approve new member', {
       networkId,
       newMemberId,
-      error: error instanceof Error ? error.message : 'Unknown error'
+      approverId,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
     });
-    res.status(500).json({ message: 'Failed to approve new member' });
+    
+    res.status(500).json({ 
+      message: 'Failed to approve new member',
+      error: 'INTERNAL_SERVER_ERROR'
+    });
   }
 }
 
@@ -1001,6 +1067,22 @@ export async function handleJoinRequest(
 
     const updatedRequest = await sql.begin(async sql => {
       if (action === 'approve') {
+        // Check if user is already a member before adding
+        const existingMember = await sql<NetworkMember[]>`
+          SELECT * FROM network_members
+          WHERE network_id = ${networkId} AND user_id = ${request.user_id}
+        `;
+
+        if (existingMember.length > 0) {
+          // User is already a member, just update the request status
+          await sql`
+            UPDATE pending_network_joins
+            SET status = 'approved'
+            WHERE id = ${requestId}
+          `;
+          return { ...request, alreadyMember: true };
+        }
+
         // Add as member and update request status
         await sql`
           INSERT INTO network_members (network_id, user_id, role)
@@ -1053,14 +1135,44 @@ export async function handleJoinRequest(
       data: { networkId }
     });
 
-    res.json({ message: `Join request ${action}ed` });
+    const responseMessage = updatedRequest.alreadyMember 
+      ? 'Join request approved (user was already a member)'
+      : `Join request ${action}ed`;
+    
+    res.json({ 
+      message: responseMessage,
+      alreadyMember: updatedRequest.alreadyMember || false
+    });
   } catch (error) {
+    // Handle specific database constraint violations
+    if (error instanceof Error) {
+      // Check for duplicate key constraint violation
+      if (error.message.includes('duplicate key value violates unique constraint') && 
+          error.message.includes('network_members_network_id_user_id_key')) {
+        logger.warn('Attempted to approve user who is already a member via join request', {
+            networkId,
+            requestId,
+            adminId,
+            error: error.message
+          });
+        return res.status(409).json({ 
+          message: 'User is already a member of this network',
+          error: 'DUPLICATE_MEMBER'
+        });
+      }
+    }
+    
     logger.error('Failed to handle join request', {
       networkId,
       requestId,
-      error: error instanceof Error ? error.message : 'Unknown error'
+      adminId,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
     });
-    res.status(500).json({ message: 'Failed to handle join request' });
+    res.status(500).json({ 
+      message: 'Failed to handle join request',
+      error: 'INTERNAL_SERVER_ERROR'
+    });
   }
 }
 

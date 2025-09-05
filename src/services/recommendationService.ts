@@ -8,9 +8,7 @@ interface UserProfile {
   id: string;
   name: string;
   bio?: string;
-  skills?: string[];
   interests?: string[];
-  experience?: string;
   goals?: string[];
 }
 
@@ -53,9 +51,7 @@ class RecommendationService {
         profile_data: {
           name: userProfile.name,
           bio: userProfile.bio,
-          skills: userProfile.skills || [],
           interests: userProfile.interests || [],
-          experience: userProfile.experience,
           goals: userProfile.goals || []
         }
       };
@@ -311,7 +307,7 @@ class RecommendationService {
    */
   private async getUserProfile(userId: string): Promise<UserProfile> {
     const [user] = await sql`
-      SELECT u.id, u.name, u.bio, u.skills, u.interests, u.experience
+      SELECT u.id, u.name, u.bio, u.interests
       FROM users u
       WHERE u.id = ${userId}
     `;
@@ -332,9 +328,7 @@ class RecommendationService {
       id: user.id,
       name: user.name,
       bio: user.bio,
-      skills: user.skills || [],
       interests: user.interests || [],
-      experience: user.experience,
       goals: userGoals.map(g => g.title)
     };
   }
@@ -410,7 +404,7 @@ class RecommendationService {
     ];
 
     const candidates = await sql`
-      SELECT DISTINCT u.id, u.name, u.bio, u.skills, u.interests, u.experience
+      SELECT DISTINCT u.id, u.name, u.bio, u.interests
       FROM users u
       JOIN network_members nm ON u.id = nm.user_id
       WHERE nm.network_id = ${networkId}
@@ -432,9 +426,7 @@ class RecommendationService {
         id: candidate.id,
         name: candidate.name,
         bio: candidate.bio,
-        skills: candidate.skills || [],
         interests: candidate.interests || [],
-        experience: candidate.experience,
         goals: candidateGoals.map(g => g.title)
       });
     }

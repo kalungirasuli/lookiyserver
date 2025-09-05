@@ -55,7 +55,6 @@ export async function getRecommendations(req: AuthRequest, res: Response) {
             id: user.id,
             name: user.name,
             bio: user.bio,
-            skills: user.skills || [],
             interests: user.interests || []
           },
           match_score: rec.match_score,
@@ -306,7 +305,7 @@ export async function getRecommendationAnalytics(req: AuthRequest, res: Response
 export async function getRecommendationHealth(req: Request, res: Response) {
   try {
     // Check AI service health
-    const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8001';
+    const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8002';
     const axios = require('axios');
     
     let aiServiceHealthy = false;

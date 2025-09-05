@@ -1,9 +1,0 @@
-fastapi
-uvicorn
-numpy
-joblib
-pydantic
-faiss-cpu
-google-generativeai
-psycopg2-binary
-sqlalchemy

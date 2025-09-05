@@ -10,7 +10,10 @@ import {
 
 const router = express.Router();
 
-// All routes require authentication
+// Health check endpoint (public, no auth required)
+router.get('/health', getRecommendationHealth);
+
+// All other routes require authentication
 router.use(authenticate);
 
 // Get recommendations for a user in a specific network
@@ -24,8 +27,5 @@ router.post('/networks/:networkId/acted-upon/:recommendedUserId', markRecommenda
 
 // Get recommendation analytics for a network (admin only)
 router.get('/networks/:networkId/analytics', getRecommendationAnalytics);
-
-// Health check endpoint
-router.get('/health', getRecommendationHealth);
 
 export default router;
