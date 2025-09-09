@@ -17,15 +17,15 @@ async function testAPI() {
         });
         console.log('✓ Legacy Recommendations:', JSON.stringify(legacyResponse.data, null, 2));
         
-        // Test 3: FAISS-based User Matching (Primary AI Method)
-        console.log('\n3. Testing FAISS-based user matching...');
+        // Test 3: Qdrant-based User Matching (Primary AI Method)
+        console.log('\n3. Testing Qdrant-based user matching...');
         const userId = '3df1c253-324f-4a47-b314-30c8cff29ce9'; // Test with Tyra Nankunda's UUID
-        const faissResponse = await axios.post(`http://localhost:8002/recommendations/${userId}`, {}, {
+        const qdrantResponse = await axios.post(`http://localhost:8002/recommendations/${userId}`, {}, {
             params: {
                 top_n: 5
             }
         });
-        console.log('✓ FAISS User Matching:', JSON.stringify(faissResponse.data, null, 2));
+        console.log('✓ Qdrant User Matching:', JSON.stringify(qdrantResponse.data, null, 2));
         
         // Test 4: Network-Scoped Recommendations
         console.log('\n4. Testing network-scoped recommendations...');
@@ -77,8 +77,8 @@ async function testAPI() {
         await axios.post(`http://localhost:8002/recommendations/${userId}`, {}, {
             params: { top_n: 10 }
         });
-        const faissTime = Date.now() - startTime;
-        console.log(`✓ FAISS Response Time: ${faissTime}ms`);
+        const qdrantTime = Date.now() - startTime;
+        console.log(`✓ Qdrant Response Time: ${qdrantTime}ms`);
         
         // Test 8: Populate Users (if needed)
         console.log('\n8. Testing user population...');

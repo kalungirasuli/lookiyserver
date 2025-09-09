@@ -1,7 +1,7 @@
 {
   "name": "ai-recommendation-service",
   "version": "1.0.0",
-  "description": "AI-powered recommendation service using FAISS and Gemini embeddings",
+  "description": "AI-powered recommendation service using Qdrant and Gemini embeddings",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -9,25 +9,23 @@
     "test": "node test.js"
   },
   "dependencies": {
-    "@google/genai": "^1.17.0",
     "@google/generative-ai": "^0.2.1",
+    "@qdrant/js-client-rest": "^1.7.0",
     "axios": "^1.6.0",
-    "compute-cosine-similarity": "^1.1.0",
+    "body-parser": "^2.2.0",
     "cors": "^2.8.5",
-    "dotenv": "^16.6.1",
+    "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "faiss-node": "^0.5.1",
     "fs-extra": "^11.1.1",
-    "postgres": "^3.4.7",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.1.10"
   },
   "keywords": [
     "ai",
     "recommendations",
-    "faiss",
+    "qdrant",
     "gemini",
     "embeddings",
     "vector-search"
