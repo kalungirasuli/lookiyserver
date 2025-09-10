@@ -3,11 +3,12 @@ import { writeFileSync, unlinkSync,readFileSync} from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';
 dotenv.config();
-export function decryptServiceAccountKeyInMemory(encryptedPath: string): object {
+export function decryptServiceAccountKeyInMemory(encryptedPath: string): object | null {
   const password = process.env.KEY_PASSWORD;
   
   if (!password) {
-    throw new Error('Missing KEY_PASSWORD environment variable');
+    console.warn('Missing KEY_PASSWORD environment variable - Google Cloud Storage will be disabled');
+    return null;
   }
 
   const tempPath = path.join(__dirname, 'temp-decrypted.json');
@@ -27,6 +28,7 @@ export function decryptServiceAccountKeyInMemory(encryptedPath: string): object 
   } catch (error) {
     // Clean up temp file if it exists
     try { unlinkSync(tempPath); } catch {}
-    throw error;
+    console.warn('OpenSSL not available or decryption failed - Google Cloud Storage will be disabled:', error instanceof Error ? error.message : 'Unknown error');
+    return null;
   }
 }

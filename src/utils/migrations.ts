@@ -310,6 +310,38 @@ export async function createTables() {
       ON user_recommendations(network_id, match_score DESC)
     `;
 
+    // Run Google OAuth migration
+    logger.info('Running Google OAuth migration...');
+    const fs = require('fs');
+    const path = require('path');
+    const migrationPath = path.join(__dirname, '../migrations/004_google_oauth_support.sql');
+    
+    try {
+      const migrationSQL = fs.readFileSync(migrationPath, 'utf8');
+      await sql.unsafe(migrationSQL);
+      logger.info('Google OAuth migration completed successfully');
+    } catch (migrationError) {
+      logger.error('Error running Google OAuth migration', {
+        error: migrationError instanceof Error ? migrationError.message : 'Unknown error'
+      });
+      // Don't throw here to allow other migrations to continue
+    }
+
+    // Run login method migration
+    logger.info('Running login method migration...');
+    const loginMethodMigrationPath = path.join(__dirname, '../migrations/005_add_login_method_column.sql');
+    
+    try {
+      const loginMethodMigrationSQL = fs.readFileSync(loginMethodMigrationPath, 'utf8');
+      await sql.unsafe(loginMethodMigrationSQL);
+      logger.info('Login method migration completed successfully');
+    } catch (migrationError) {
+      logger.error('Error running login method migration', {
+        error: migrationError instanceof Error ? migrationError.message : 'Unknown error'
+      });
+      // Don't throw here to allow other migrations to continue
+    }
+
     logger.info('All database tables created successfully');
   } catch (error) {
     logger.error('Error creating database tables', {

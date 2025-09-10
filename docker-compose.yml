@@ -22,7 +22,25 @@ services:
     build:
       context: ./AI
     ports:
-      - "8001:8000"
+      - "8003:8003"
+    environment:
+      - NODE_ENV=production
+      - PORT=8003
+      - HOST=0.0.0.0
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USERNAME=admin
+      - POSTGRES_PASSWORD=supersecretpassword
+      - POSTGRES_DB=lookiy
+      - DATABASE_URL=postgresql://admin:supersecretpassword@postgres:5432/lookiy
+      - FAISS_INDEX_PATH=./data
+      - EMBEDDING_DIM=768
+      - LOG_LEVEL=INFO
+    depends_on:
+      - postgres
+    volumes:
+      - ai_data:/app/data
     networks:
       - lookiy_network
 
@@ -79,6 +97,7 @@ services:
 volumes:
   postgres_data:
   redis_data:
+  ai_data:
 
 networks:
   lookiy_network:

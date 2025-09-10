@@ -7,7 +7,9 @@ export interface BaseModel {
 export interface User extends BaseModel {
   name: string;
   email: string;
-  password: string;
+  password?: string; // Now nullable for Google users
+  google_id?: string; // Google OAuth ID
+  is_google_user: boolean; // Flag to identify Google users
   description?: string;
   interests?: string[];
   avatar?: string;
@@ -168,4 +170,49 @@ export interface RecommendationCache {
     cached_at: Date;
   }[];
   last_updated: Date;
+}
+
+// Google OAuth related interfaces
+export interface GoogleUserTemp extends BaseModel {
+  google_id: string;
+  email: string;
+  name: string;
+  profile_pic?: string;
+}
+
+export interface GoogleUserRegistrationState extends BaseModel {
+  user_id: string; // Can reference either google_users_temp.id or users.id
+  step_completed: Record<string, boolean>; // JSON object tracking completed steps
+  is_complete: boolean;
+}
+
+export interface GoogleUserRegistrationTempData extends BaseModel {
+  user_id: string; // References google_users_temp.id
+  bio?: string;
+  interests?: string; // JSON array as string
+  location?: string;
+  phone?: string;
+  description?: string;
+  is_public: boolean;
+  connection_request_privacy: 'public' | 'network_only' | 'verified_only' | 'none';
+}
+
+// Google OAuth registration step types
+export type GoogleRegistrationStep = 
+  | 'basic_info'
+  | 'bio'
+  | 'interests'
+  | 'location'
+  | 'phone'
+  | 'privacy_settings'
+  | 'profile_completion';
+
+export interface GoogleRegistrationSteps {
+  basic_info: boolean;
+  bio: boolean;
+  interests: boolean;
+  location: boolean;
+  phone: boolean;
+  privacy_settings: boolean;
+  profile_completion: boolean;
 }

@@ -13,6 +13,7 @@ import { generateAndUploadAvatar } from '../utils/avatar';
 import { cacheGet, cacheSet, cacheDelete } from '../utils/redis';
 import { kafkaService, KafkaTopics } from '../utils/kafka';
 import { getSocketService } from '../utils/socket';
+import crypto from 'crypto';
 
 interface CachedSuspension {
   userId: string;
@@ -42,7 +43,7 @@ interface RegisterRequestBody {
 
 interface LoginRequestBody {
   email: string;
-  password: string;
+  password?: string; // Optional for Google users
 }
 
 interface VerifyEmailQuery {
@@ -82,10 +83,11 @@ export async function register(
     `;
     
     const userId = result[0].id;
-
+   
     // Generate and upload default avatar
     try {
       const avatarUrl = await generateAndUploadAvatar(userId);
+       console.log("generating avatar", avatarUrl)
       await sql`
         UPDATE users
         SET avatar = ${avatarUrl}
@@ -278,9 +280,9 @@ async function login(
   const { email, password } = req.body;
   const ipAddress = req.ip || req.socket.remoteAddress || 'unknown';
   
-  if (!email || !password) {
-    logger.warn('Login attempt with missing credentials');
-    return res.status(400).json({ message: 'Email and password are required' });
+  if (!email) {
+    logger.warn('Login attempt with missing email');
+    return res.status(400).json({ message: 'Email is required' });
   }
 
   try {
@@ -305,14 +307,39 @@ async function login(
       });
     }
 
-    const isValidPassword = await bcrypt.compare(password, user.password);
+    let isValidPassword = false;
+    
+    // Handle Google users vs regular users
+    if (user.is_google_user && !password) {
+      // Google users can login without password if they don't have one set
+      if (!user.password) {
+        logger.warn('Google user attempting email/password login without password set', { email });
+        return res.status(400).json({ 
+          message: 'This Google account does not exist. Please use Google Sign-In.' 
+        });
+      }
+      // If Google user has password set, they still need to provide it
+      logger.warn('Google user attempting login without password', { email });
+      return res.status(400).json({ message: 'Password is required' });
+    } else if (!user.is_google_user && !password) {
+      // Regular users always need password
+      logger.warn('Regular user attempting login without password', { email });
+      return res.status(400).json({ message: 'Password is required' });
+    } else if (password && user.password) {
+      // Validate password for both user types when password is provided
+      isValidPassword = await bcrypt.compare(password, user.password);
+    } else if (password && !user.password) {
+      // User provided password but account has no password (shouldn't happen)
+      logger.warn('Password provided for account without password', { email });
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
     
     // Record the login attempt
     await sql`
       INSERT INTO login_attempts (
-        user_id, ip_address, is_successful
+        user_id, ip_address, is_successful, login_method
       ) VALUES (
-        ${user.id}, ${ipAddress}, ${isValidPassword}
+        ${user.id}, ${ipAddress}, ${isValidPassword}, 'email_password'
       )
     `;
 
@@ -1147,5 +1174,76 @@ export async function updatePrivacySettings(
       error: error instanceof Error ? error.message : 'Unknown error'
     });
     res.status(500).json({ message: 'Failed to update privacy settings' });
+  }
+}
+
+// Helper functions for Google OAuth integration
+export function generateTwoFactorCode(): string {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+export async function sendTwoFactorEmail(email: string, code: string): Promise<void> {
+  // Use existing email service - you may need to create this function
+  // For now, using a placeholder that matches the existing email pattern
+  try {
+    // This should integrate with your existing email service
+    await sendLoginAlertEmail(email, {
+      browser: { name: '2FA', version: '' },
+      os: { name: 'System', version: '' },
+      device: { vendor: '', model: '', type: '' }
+    }, 'system', code, 'system');
+  } catch (error) {
+    logger.error('Failed to send 2FA email:', error);
+    throw error;
+  }
+}
+
+export async function logLoginAttempt(
+  userId: string, 
+  ipAddress: string, 
+  method: string, 
+  isSuccessful: boolean
+): Promise<void> {
+  try {
+    await sql`
+      INSERT INTO login_attempts (
+        user_id, ip_address, is_successful, login_method, attempted_at
+      ) VALUES (
+        ${userId}, ${ipAddress}, ${isSuccessful}, ${method}, NOW()
+      )
+    `;
+  } catch (error) {
+    logger.error('Failed to log login attempt:', error);
+  }
+}
+
+export async function sendLoginAlert(
+  email: string, 
+  loginInfo: {
+    loginTime: Date;
+    ipAddress: string;
+    userAgent: string;
+    loginMethod: string;
+  }
+): Promise<void> {
+  try {
+    const parser = new UAParser();
+    parser.setUA(loginInfo.userAgent);
+    const deviceInfo = {
+      browser: parser.getBrowser(),
+      os: parser.getOS(),
+      device: parser.getDevice()
+    };
+
+    // Use existing login alert email function
+    await sendLoginAlertEmail(
+      email,
+      deviceInfo,
+      loginInfo.ipAddress,
+      crypto.randomUUID(),
+      crypto.randomUUID()
+    );
+  } catch (error) {
+    logger.error('Failed to send login alert:', error);
   }
 }

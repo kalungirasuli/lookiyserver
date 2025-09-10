@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { AuthRequest } from '../middleware/auth';
 import sql from '../utils/db';
 import { Network, NetworkMember, NetworkInvitation, NetworkGoal ,PendingNetworkJoin} from '../models/database';
-import { generateAndUploadAvatar } from '../utils/avatar';
+// Removed avatar generation import - using placeholder logic
 import { generateCustomQR } from '../utils/qrGenerator';
 import { uploadToGCS } from '../utils/storage';
 import logger from '../utils/logger';
@@ -116,22 +116,8 @@ export async function createNetwork(
         )
       `;
 
-      // Generate and save network avatar
-      try {
-        const avatarUrl = await generateAndUploadAvatar(network.id);
-        await sql`
-          UPDATE networks
-          SET avatar = ${avatarUrl}
-          WHERE id = ${network.id}
-        `;
-        network.avatar = avatarUrl;
-      } catch (avatarError) {
-        logger.error('Failed to generate network avatar', {
-          networkId: network.id,
-          error: avatarError instanceof Error ? avatarError.message : 'Unknown error'
-        });
-        // Continue without avatar
-      }
+      // Leave network avatar as null - will use placeholder logic on frontend
+      // No automatic avatar generation during network creation
 
       // After successful creation, publish event
       await kafkaService.publishEvent(KafkaTopics.NETWORK_UPDATES, {

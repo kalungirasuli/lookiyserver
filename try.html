@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Submit User Data</title>
+</head>
+<body>
+  <h2>User Registration Form</h2>
+  <form id="userForm">
+    <label for="name">Name:</label><br>
+    <input type="text" id="name" name="name" value="kalungi rasuli" required><br><br>
+
+    <label for="email">Email:</label><br>
+    <input type="email" id="email" name="email" value="kalungi@gmail.com" required><br><br>
+
+    <label for="password">Password:</label><br>
+    <input type="password" id="password" name="password" value="kalungi@2002" required><br><br>
+
+    <label for="description">Description:</label><br>
+    <textarea id="description" name="description" rows="5" cols="50" required>
+Kalungi rasuli is a tech innovator and systems architect based in Uganda. As the CTO of Mibut, he leads the development of intelligent, decentralized platforms focused on education, collaboration, and digital transformation. Passionate about ethical AI and scalable infrastructure, Kalungi builds solutions that bridge real-world impact with cutting-edge technology.
+    </textarea><br><br>
+
+    <label for="interests">Interests (comma separated):</label><br>
+    <input type="text" id="interests" name="interests" value="Artificial Intelligence, Decentralized Systems, EdTech Innovation, Human-Centered Design, Ethical Technology, Open Source Development, Digital Transformation, Creative Problem Solving, System Architecture, Social Impact through Tech" required><br><br>
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <script>
+    const form = document.getElementById('userForm');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const data = {
+        name: form.name.value,
+        email: form.email.value,
+        password: form.password.value,
+        description: form.description.value,
+        interests: form.interests.value.split(',').map(item => item.trim())
+      };
+
+      try {
+        const response = await fetch('http://localhost:3000/v1/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        alert('User submitted successfully: ' + JSON.stringify(result));
+      } catch (err) {
+        console.error('Error submitting user:', err);
+        alert('Failed to submit user');
+      }
+    });
+  </script>
+</body>
+</html>

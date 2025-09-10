@@ -1,0 +1,14 @@
+node_modules
+npm-debug.log
+.git
+.gitignore
+README.md
+.env
+.nyc_output
+coverage
+.nyc_output
+*.log
+user_index.faiss
+user_mapping.json
+network_mapping.json
+test-api.js

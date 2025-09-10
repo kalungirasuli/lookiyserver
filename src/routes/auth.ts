@@ -15,9 +15,11 @@ import {
 } from '../controllers/authController';
 import { authenticate } from '../middleware/auth';
 import { avatarUpload } from '../utils/storage';
+import googleAuthRouter from './googleAuth';
 
 const router = Router();
 
+// Regular authentication routes
 router.post('/register', register);
 router.get('/verify-email', verifyEmail);
 router.post('/login', login);
@@ -30,5 +32,8 @@ router.post('/recover-account', recoverAccount);
 router.put('/profile', authenticate, avatarUpload, editProfile);
 router.get('/privacy-settings', authenticate, getPrivacySettings);
 router.put('/privacy-settings', authenticate, updatePrivacySettings);
+
+// Google OAuth routes
+router.use('/', googleAuthRouter);
 
 export default router;
