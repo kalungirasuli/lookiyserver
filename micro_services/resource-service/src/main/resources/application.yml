@@ -1,0 +1,9 @@
+spring.application:
+  name: resource-service
+
+resource:
+  service-url: ${RESOURCE-SERVICE-URL:http://localhost:8080}
+  datasource: ${RESOURCE-DATASOURCE:data/}
+
+server:
+  port: 8080
