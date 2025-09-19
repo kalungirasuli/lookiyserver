@@ -18,6 +18,14 @@ services:
     networks:
       - lookiy_network
 
+  ai:
+    build:
+      context: ./AI
+    ports:
+      - "8001:8000"
+    networks:
+      - lookiy_network
+
   postgres:
     image: postgres:14-alpine
     environment:

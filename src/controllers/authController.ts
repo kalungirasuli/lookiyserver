@@ -771,7 +771,7 @@ export async function recoverAccount(
     // Publish account recovery event
     await kafkaService.publishEvent(KafkaTopics.USER_ACTIVITY, {
       type: 'account_recovered',
-      userId,
+      userId: deletionRecord.user_id,
       data: {
         timestamp: new Date()
       }
@@ -890,19 +890,19 @@ export async function loginCheck(
       // Handle login separately to properly manage response
       const loginResponse = await login(req, res);
       
-      // If login was successful and response includes user data
-      if (loginResponse?.user) {
+      // If login was successful and user data exists
+      if (user) {
         await kafkaService.publishEvent(KafkaTopics.USER_ACTIVITY, {
           type: 'login',
-          userId: loginResponse.user.id,
+          userId: user.id,
           data: {
-            email: loginResponse.user.email,
+            email: user.email,
             timestamp: new Date()
           }
         });
 
         // Broadcast user status
-        getSocketService().broadcastUserStatus(loginResponse.user.id, 'online');
+        getSocketService().broadcastUserStatus(user.id, 'online');
       }
       
       return loginResponse;
@@ -955,7 +955,7 @@ export async function editProfile(
     }
 
     const updates = [];
-    const { name, description, interests, isPublic, email } = req.body?req.body:{};
+    const { name, description, interests, isPublic, email } = req.body || {};
     console.log('Processing update fields:', { name, description, interests, isPublic, email });
     
     // Handle file upload if present
@@ -1071,5 +1071,81 @@ export async function editProfile(
       error: err instanceof Error ? err.message : 'Unknown error'
     });
     res.status(500).json({ message: 'Failed to update profile' });
+  }
+}
+
+interface PrivacySettingsRequestBody {
+  connection_request_privacy: 'public' | 'network_only' | 'verified_only' | 'none';
+}
+
+export async function getPrivacySettings(
+  req: AuthRequest,
+  res: Response
+) {
+  try {
+    const userId = req.user!.id;
+
+    const user = await sql`
+      SELECT connection_request_privacy, ispublic, isverified 
+      FROM users 
+      WHERE id = ${userId}
+    `;
+
+    if (user.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({
+      connection_request_privacy: user[0].connection_request_privacy,
+      isPublic: user[0].ispublic,
+      isVerified: user[0].isverified
+    });
+  } catch (error) {
+    logger.error('Error fetching privacy settings:', {
+      userId: req.user!.id,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+    res.status(500).json({ message: 'Failed to fetch privacy settings' });
+  }
+}
+
+export async function updatePrivacySettings(
+  req: AuthRequest,
+  res: Response
+) {
+  try {
+    const userId = req.user!.id;
+    const { connection_request_privacy } = req.body as PrivacySettingsRequestBody;
+
+    // Validate privacy setting
+    const validSettings = ['public', 'network_only', 'verified_only', 'none'];
+    if (!validSettings.includes(connection_request_privacy)) {
+      return res.status(400).json({ 
+        message: 'Invalid privacy setting. Must be one of: public, network_only, verified_only, none' 
+      });
+    }
+
+    await sql`
+      UPDATE users 
+      SET connection_request_privacy = ${connection_request_privacy}, 
+          updatedat = NOW()
+      WHERE id = ${userId}
+    `;
+
+    logger.info('Privacy settings updated', {
+      userId,
+      newSetting: connection_request_privacy
+    });
+
+    res.json({ 
+      message: 'Privacy settings updated successfully',
+      connection_request_privacy 
+    });
+  } catch (error) {
+    logger.error('Error updating privacy settings:', {
+      userId: req.user!.id,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+    res.status(500).json({ message: 'Failed to update privacy settings' });
   }
 }

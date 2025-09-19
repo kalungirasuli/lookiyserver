@@ -1,0 +1,1071 @@
+{
+  "1": {
+    "id": "3df1c253-324f-4a47-b314-30c8cff29ce9",
+    "name": "Tyra Nankunda",
+    "email": "tyra.nankunda@example.com",
+    "description": "Tyra Nankunda is a social media strategist passionate about shaping narratives and amplifying voices. With a focus on African political landscapes, she designs campaigns that inspire civic engagement and positive influence.",
+    "interests": "[\"Social Media Strategy\",\"Political Communication\",\"Civic Engagement\",\"Community Building\",\"Digital Storytelling\",\"Cultural Narratives\",\"Grassroots Movements\",\"Public Relations\",\"Advocacy\",\"Media Innovation\"]",
+    "profileText": "Tyra Nankunda",
+    "addedAt": "2025-09-05T14:32:11.333Z"
+  },
+  "2": {
+    "id": "27734422-cfd9-47c4-8680-e3b9f48f9cc3",
+    "name": "kalungi rasuli",
+    "email": "kalungi@gmail.com",
+    "description": "Kalungi rasuli is a tech innovator and systems architect based in Uganda. As the CTO of Mibut, he leads the development of intelligent, decentralized platforms focused on education, collaboration, and digital transformation. Passionate about ethical AI and scalable infrastructure, Kalungi builds solutions that bridge real-world impact with cutting-edge technology.",
+    "interests": "[\"Artificial Intelligence\",\"Decentralized Systems\",\"EdTech Innovation\",\"Human-Centered Design\",\"Ethical Technology\",\"Open Source Development\",\"Digital Transformation\",\"Creative Problem Solving\",\"System Architecture\",\"Social Impact through Tech\"]",
+    "profileText": "kalungi rasuli",
+    "addedAt": "2025-09-05T14:32:11.898Z"
+  },
+  "3": {
+    "id": "db227aa5-8219-416c-b644-3d941676ac99",
+    "name": "Michael Kato",
+    "email": "michael.kato@example.com",
+    "description": "Michael Kato is a software engineer specializing in cloud-native applications. He is dedicated to building scalable backend systems and mentoring young developers.",
+    "interests": "[\"Cloud Computing\",\"Backend Development\",\"APIs\",\"Scalable Systems\",\"Mentorship\",\"Open Source\",\"Database Design\",\"Microservices\",\"DevOps\",\"Automation\"]",
+    "profileText": "Michael Kato",
+    "addedAt": "2025-09-05T14:32:12.359Z"
+  },
+  "4": {
+    "id": "d6446264-ac98-4d21-9b55-d7023c62c066",
+    "name": "Sarah Lumu",
+    "email": "sarah.lumu@example.com",
+    "description": "Sarah Lumu is an EdTech entrepreneur creating digital tools for underserved communities. She believes in the power of education to transform societies.",
+    "interests": "[\"Education Technology\",\"Accessibility\",\"Digital Inclusion\",\"Curriculum Innovation\",\"Startups\",\"Female Leadership\",\"Technology for Good\",\"Community Outreach\",\"Mobile Learning\",\"Impact Measurement\"]",
+    "profileText": "Sarah Lumu",
+    "addedAt": "2025-09-05T14:32:12.910Z"
+  },
+  "5": {
+    "id": "9a04b7a3-b84b-42a3-af3c-ec17b1952454",
+    "name": "Grace Namara",
+    "email": "grace.namara@example.com",
+    "description": "Grace Namara is a UX designer passionate about creating intuitive and accessible digital experiences. She thrives at the intersection of design and human psychology.",
+    "interests": "[\"UX Design\",\"Accessibility\",\"Human-Centered Design\",\"Behavioral Psychology\",\"Interaction Design\",\"Prototyping\",\"UI Design\",\"Creative Arts\",\"Inclusive Technology\",\"Digital Wellbeing\"]",
+    "profileText": "Grace Namara",
+    "addedAt": "2025-09-05T14:32:13.381Z"
+  },
+  "6": {
+    "id": "f24ec8ee-ab38-462e-baae-de11cdcd2c5b",
+    "name": "Peter Mugisha",
+    "email": "peter.mugisha@example.com",
+    "description": "Peter Mugisha is a cybersecurity analyst with a focus on threat detection and prevention. He advocates for stronger cybersecurity awareness in Africa.",
+    "interests": "[\"Cybersecurity\",\"Threat Analysis\",\"Incident Response\",\"Network Security\",\"Cloud Security\",\"Cyber Awareness\",\"Penetration Testing\",\"Risk Management\",\"Encryption\",\"Privacy Advocacy\"]",
+    "profileText": "Peter Mugisha",
+    "addedAt": "2025-09-05T14:32:13.941Z"
+  },
+  "7": {
+    "id": "e9116c9f-f46d-4dbf-a106-0633ee543147",
+    "name": "Linda Kyomuhendo",
+    "email": "linda.kyomu@example.com",
+    "description": "Linda Kyomuhendo is a digital artist and storyteller exploring African heritage through new media. She blends technology and culture to inspire creativity.",
+    "interests": "[\"Digital Art\",\"Storytelling\",\"African Heritage\",\"Virtual Reality\",\"Augmented Reality\",\"Film and Media\",\"Creative Coding\",\"Community Arts\",\"Cultural Innovation\",\"3D Design\"]",
+    "profileText": "Linda Kyomuhendo",
+    "addedAt": "2025-09-05T14:32:14.445Z"
+  },
+  "8": {
+    "id": "965f6160-eaf4-4cba-b014-d96dee0c769c",
+    "name": "Samuel Bwogi",
+    "email": "samuel.bwogi@example.com",
+    "description": "Samuel Bwogi is a blockchain developer working on decentralized finance applications. He is passionate about democratizing access to financial systems.",
+    "interests": "[\"Blockchain\",\"DeFi\",\"Smart Contracts\",\"Cryptography\",\"Financial Inclusion\",\"Tokenomics\",\"Decentralization\",\"Open Finance\",\"Web3\",\"Digital Identity\"]",
+    "profileText": "Samuel Bwogi",
+    "addedAt": "2025-09-05T14:32:15.016Z"
+  },
+  "9": {
+    "id": "c1a65c92-7c77-4bd6-b607-22477c94dddd",
+    "name": "Anita Kabugo",
+    "email": "anita.kabugo@example.com",
+    "description": "Anita Kabugo is a healthcare innovator leveraging digital health platforms to improve patient outcomes and data-driven medical research.",
+    "interests": "[\"Digital Health\",\"Patient Care\",\"Medical Data\",\"Telemedicine\",\"Wearable Devices\",\"Healthcare Policy\",\"AI in Medicine\",\"Clinical Research\",\"Community Health\",\"EHR Systems\"]",
+    "profileText": "Anita Kabugo",
+    "addedAt": "2025-09-05T14:32:15.464Z"
+  },
+  "10": {
+    "id": "cd6b8133-0742-4726-bc51-0d5c9d1f0365",
+    "name": "James Tumwine",
+    "email": "james.tumwine@example.com",
+    "description": "James Tumwine is an economist researching digital economies and how technology reshapes trade in Africa.",
+    "interests": "[\"Economics\",\"Digital Trade\",\"FinTech\",\"Data-Driven Policy\",\"Global Markets\",\"Sustainable Growth\",\"Innovation Policy\",\"Business Intelligence\",\"Financial Modeling\",\"Economic Development\"]",
+    "profileText": "James Tumwine",
+    "addedAt": "2025-09-05T14:32:16.069Z"
+  },
+  "11": {
+    "id": "c886229e-6593-46d3-949f-69900ab5e5be",
+    "name": "Ruth Aine",
+    "email": "ruth.aine@example.com",
+    "description": "Ruth Aine is a journalist and media trainer focusing on digital rights, freedom of expression, and storytelling for change.",
+    "interests": "[\"Journalism\",\"Digital Rights\",\"Freedom of Expression\",\"Investigative Reporting\",\"Media Literacy\",\"Training\",\"Storytelling\",\"Public Policy\",\"Open Internet\",\"Community Voice\"]",
+    "profileText": "Ruth Aine",
+    "addedAt": "2025-09-05T14:32:16.691Z"
+  },
+  "12": {
+    "id": "bc9a0115-985e-48bd-a158-205a7d3c70b5",
+    "name": "Brian Musoke",
+    "email": "brian.musoke@example.com",
+    "description": "Brian Musoke is a data scientist specializing in predictive analytics for agriculture and food security.",
+    "interests": "[\"Data Science\",\"Predictive Analytics\",\"Agriculture\",\"Food Security\",\"Remote Sensing\",\"Geospatial Data\",\"Climate Change\",\"Machine Learning\",\"Big Data\",\"Sustainability\"]",
+    "profileText": "Brian Musoke",
+    "addedAt": "2025-09-05T14:32:17.139Z"
+  },
+  "13": {
+    "id": "b64ddb6f-ddfc-4675-b2f5-ef2cbc906495",
+    "name": "Esther Nakato",
+    "email": "esther.nakato@example.com",
+    "description": "Esther Nakato is a digital marketer focused on brand growth and online engagement strategies for startups.",
+    "interests": "[\"Digital Marketing\",\"SEO\",\"Content Strategy\",\"Analytics\",\"Brand Growth\",\"Social Media\",\"Email Marketing\",\"PPC Campaigns\",\"Influencer Marketing\",\"Consumer Behavior\"]",
+    "profileText": "Esther Nakato",
+    "addedAt": "2025-09-05T14:32:17.716Z"
+  },
+  "14": {
+    "id": "9f13ec9f-6cb1-4141-b83d-d5c87c104ca9",
+    "name": "Allan Byaruhanga",
+    "email": "allan.byaruhanga@example.com",
+    "description": "Allan Byaruhanga is a robotics engineer passionate about designing autonomous systems for industrial and agricultural use.",
+    "interests": "[\"Robotics\",\"Autonomous Systems\",\"Industrial Automation\",\"Agricultural Technology\",\"Sensors\",\"AI\",\"Mechanical Design\",\"Electronics\",\"Mechatronics\",\"Control Systems\"]",
+    "profileText": "Allan Byaruhanga",
+    "addedAt": "2025-09-05T14:32:18.218Z"
+  },
+  "15": {
+    "id": "4bdd208c-69d9-4af0-ad37-7a1724cd7840",
+    "name": "Catherine Nabirye",
+    "email": "catherine.nabirye@example.com",
+    "description": "Catherine Nabirye is a humanitarian project manager working with NGOs to coordinate disaster relief and capacity building.",
+    "interests": "[\"Humanitarian Aid\",\"NGOs\",\"Disaster Relief\",\"Project Management\",\"Capacity Building\",\"Community Development\",\"International Relations\",\"Nonprofit Strategy\",\"Resilience\",\"Volunteerism\"]",
+    "profileText": "Catherine Nabirye",
+    "addedAt": "2025-09-05T14:32:18.726Z"
+  },
+  "16": {
+    "id": "b9a4d2ff-9f4b-47c3-8fc4-4bbaec1699df",
+    "name": "David Okello",
+    "email": "david.okello@example.com",
+    "description": "David Okello is a machine learning researcher focused on natural language processing and low-resource languages. He aims to bridge gaps in African linguistics using AI.",
+    "interests": "[\"Machine Learning\",\"Natural Language Processing\",\"Low-resource Languages\",\"Data Science\",\"AI Research\",\"Computational Linguistics\",\"Speech Recognition\",\"Language Models\",\"Deep Learning\",\"Responsible AI\"]",
+    "profileText": "David Okello",
+    "addedAt": "2025-09-05T14:32:19.244Z"
+  },
+  "17": {
+    "id": "d68063b7-6e04-4119-8c3e-21a2b0938ba1",
+    "name": "Isaac Mulindwa",
+    "email": "isaac.mulindwa@example.com",
+    "description": "Isaac Mulindwa is a fintech innovator working on mobile money integrations for unbanked populations in Africa.",
+    "interests": "[\"FinTech\",\"Mobile Money\",\"Payments\",\"Financial Inclusion\",\"APIs\",\"Banking Innovation\",\"Digital Wallets\",\"Blockchain\",\"Consumer Finance\",\"Financial Literacy\"]",
+    "profileText": "Isaac Mulindwa",
+    "addedAt": "2025-09-05T14:32:19.715Z"
+  },
+  "18": {
+    "id": "5ddea4be-c132-4313-a74e-5dc5e4af24f4",
+    "name": "Patricia Adoch",
+    "email": "patricia.adoch@example.com",
+    "description": "Patricia Adoch is a climate activist advocating for renewable energy adoption and sustainable policy frameworks.",
+    "interests": "[\"Climate Change\",\"Renewable Energy\",\"Sustainability\",\"Policy\",\"Activism\",\"Community Engagement\",\"Green Tech\",\"Conservation\",\"Environmental Science\",\"Energy Innovation\"]",
+    "profileText": "Patricia Adoch",
+    "addedAt": "2025-09-05T14:32:20.374Z"
+  },
+  "19": {
+    "id": "5050f0b0-01a6-4fa9-b894-2076c3c51e6a",
+    "name": "Ronald Ssemanda",
+    "email": "ronald.ssemanda@example.com",
+    "description": "Ronald Ssemanda is a game developer creating immersive African-inspired gaming experiences.",
+    "interests": "[\"Game Development\",\"Unity\",\"Unreal Engine\",\"3D Modeling\",\"Animation\",\"Storytelling\",\"Esports\",\"VR Gaming\",\"Interactive Media\",\"Art Direction\"]",
+    "profileText": "Ronald Ssemanda",
+    "addedAt": "2025-09-05T14:32:20.825Z"
+  },
+  "20": {
+    "id": "596f3806-4a04-41c1-a360-1da480010057",
+    "name": "Florence Atwine",
+    "email": "florence.atwine@example.com",
+    "description": "Florence Atwine is a public health expert leveraging data analytics for epidemic tracking and prevention.",
+    "interests": "[\"Public Health\",\"Epidemiology\",\"Data Analytics\",\"Disease Prevention\",\"Healthcare Innovation\",\"Biostatistics\",\"Global Health\",\"Community Awareness\",\"AI in Healthcare\",\"Policy Development\"]",
+    "profileText": "Florence Atwine",
+    "addedAt": "2025-09-05T14:32:21.441Z"
+  },
+  "21": {
+    "id": "3df1c253-324f-4a47-b314-30c8cff29ce9",
+    "name": "Tyra Nankunda",
+    "email": "tyra.nankunda@example.com",
+    "description": "Tyra Nankunda is a social media strategist passionate about shaping narratives and amplifying voices. With a focus on African political landscapes, she designs campaigns that inspire civic engagement and positive influence.",
+    "interests": "[\"Social Media Strategy\",\"Political Communication\",\"Civic Engagement\",\"Community Building\",\"Digital Storytelling\",\"Cultural Narratives\",\"Grassroots Movements\",\"Public Relations\",\"Advocacy\",\"Media Innovation\"]",
+    "profileText": "Tyra Nankunda",
+    "addedAt": "2025-09-05T15:04:29.469Z"
+  },
+  "22": {
+    "id": "27734422-cfd9-47c4-8680-e3b9f48f9cc3",
+    "name": "kalungi rasuli",
+    "email": "kalungi@gmail.com",
+    "description": "Kalungi rasuli is a tech innovator and systems architect based in Uganda. As the CTO of Mibut, he leads the development of intelligent, decentralized platforms focused on education, collaboration, and digital transformation. Passionate about ethical AI and scalable infrastructure, Kalungi builds solutions that bridge real-world impact with cutting-edge technology.",
+    "interests": "[\"Artificial Intelligence\",\"Decentralized Systems\",\"EdTech Innovation\",\"Human-Centered Design\",\"Ethical Technology\",\"Open Source Development\",\"Digital Transformation\",\"Creative Problem Solving\",\"System Architecture\",\"Social Impact through Tech\"]",
+    "profileText": "kalungi rasuli",
+    "addedAt": "2025-09-05T15:04:30.032Z"
+  },
+  "23": {
+    "id": "db227aa5-8219-416c-b644-3d941676ac99",
+    "name": "Michael Kato",
+    "email": "michael.kato@example.com",
+    "description": "Michael Kato is a software engineer specializing in cloud-native applications. He is dedicated to building scalable backend systems and mentoring young developers.",
+    "interests": "[\"Cloud Computing\",\"Backend Development\",\"APIs\",\"Scalable Systems\",\"Mentorship\",\"Open Source\",\"Database Design\",\"Microservices\",\"DevOps\",\"Automation\"]",
+    "profileText": "Michael Kato",
+    "addedAt": "2025-09-05T15:04:30.491Z"
+  },
+  "24": {
+    "id": "d6446264-ac98-4d21-9b55-d7023c62c066",
+    "name": "Sarah Lumu",
+    "email": "sarah.lumu@example.com",
+    "description": "Sarah Lumu is an EdTech entrepreneur creating digital tools for underserved communities. She believes in the power of education to transform societies.",
+    "interests": "[\"Education Technology\",\"Accessibility\",\"Digital Inclusion\",\"Curriculum Innovation\",\"Startups\",\"Female Leadership\",\"Technology for Good\",\"Community Outreach\",\"Mobile Learning\",\"Impact Measurement\"]",
+    "profileText": "Sarah Lumu",
+    "addedAt": "2025-09-05T15:04:31.045Z"
+  },
+  "25": {
+    "id": "9a04b7a3-b84b-42a3-af3c-ec17b1952454",
+    "name": "Grace Namara",
+    "email": "grace.namara@example.com",
+    "description": "Grace Namara is a UX designer passionate about creating intuitive and accessible digital experiences. She thrives at the intersection of design and human psychology.",
+    "interests": "[\"UX Design\",\"Accessibility\",\"Human-Centered Design\",\"Behavioral Psychology\",\"Interaction Design\",\"Prototyping\",\"UI Design\",\"Creative Arts\",\"Inclusive Technology\",\"Digital Wellbeing\"]",
+    "profileText": "Grace Namara",
+    "addedAt": "2025-09-05T15:04:31.502Z"
+  },
+  "26": {
+    "id": "f24ec8ee-ab38-462e-baae-de11cdcd2c5b",
+    "name": "Peter Mugisha",
+    "email": "peter.mugisha@example.com",
+    "description": "Peter Mugisha is a cybersecurity analyst with a focus on threat detection and prevention. He advocates for stronger cybersecurity awareness in Africa.",
+    "interests": "[\"Cybersecurity\",\"Threat Analysis\",\"Incident Response\",\"Network Security\",\"Cloud Security\",\"Cyber Awareness\",\"Penetration Testing\",\"Risk Management\",\"Encryption\",\"Privacy Advocacy\"]",
+    "profileText": "Peter Mugisha",
+    "addedAt": "2025-09-05T15:04:32.107Z"
+  },
+  "27": {
+    "id": "e9116c9f-f46d-4dbf-a106-0633ee543147",
+    "name": "Linda Kyomuhendo",
+    "email": "linda.kyomu@example.com",
+    "description": "Linda Kyomuhendo is a digital artist and storyteller exploring African heritage through new media. She blends technology and culture to inspire creativity.",
+    "interests": "[\"Digital Art\",\"Storytelling\",\"African Heritage\",\"Virtual Reality\",\"Augmented Reality\",\"Film and Media\",\"Creative Coding\",\"Community Arts\",\"Cultural Innovation\",\"3D Design\"]",
+    "profileText": "Linda Kyomuhendo",
+    "addedAt": "2025-09-05T15:04:32.519Z"
+  },
+  "28": {
+    "id": "965f6160-eaf4-4cba-b014-d96dee0c769c",
+    "name": "Samuel Bwogi",
+    "email": "samuel.bwogi@example.com",
+    "description": "Samuel Bwogi is a blockchain developer working on decentralized finance applications. He is passionate about democratizing access to financial systems.",
+    "interests": "[\"Blockchain\",\"DeFi\",\"Smart Contracts\",\"Cryptography\",\"Financial Inclusion\",\"Tokenomics\",\"Decentralization\",\"Open Finance\",\"Web3\",\"Digital Identity\"]",
+    "profileText": "Samuel Bwogi",
+    "addedAt": "2025-09-05T15:04:33.112Z"
+  },
+  "29": {
+    "id": "c1a65c92-7c77-4bd6-b607-22477c94dddd",
+    "name": "Anita Kabugo",
+    "email": "anita.kabugo@example.com",
+    "description": "Anita Kabugo is a healthcare innovator leveraging digital health platforms to improve patient outcomes and data-driven medical research.",
+    "interests": "[\"Digital Health\",\"Patient Care\",\"Medical Data\",\"Telemedicine\",\"Wearable Devices\",\"Healthcare Policy\",\"AI in Medicine\",\"Clinical Research\",\"Community Health\",\"EHR Systems\"]",
+    "profileText": "Anita Kabugo",
+    "addedAt": "2025-09-05T15:04:33.559Z"
+  },
+  "30": {
+    "id": "cd6b8133-0742-4726-bc51-0d5c9d1f0365",
+    "name": "James Tumwine",
+    "email": "james.tumwine@example.com",
+    "description": "James Tumwine is an economist researching digital economies and how technology reshapes trade in Africa.",
+    "interests": "[\"Economics\",\"Digital Trade\",\"FinTech\",\"Data-Driven Policy\",\"Global Markets\",\"Sustainable Growth\",\"Innovation Policy\",\"Business Intelligence\",\"Financial Modeling\",\"Economic Development\"]",
+    "profileText": "James Tumwine",
+    "addedAt": "2025-09-05T15:04:34.112Z"
+  },
+  "31": {
+    "id": "c886229e-6593-46d3-949f-69900ab5e5be",
+    "name": "Ruth Aine",
+    "email": "ruth.aine@example.com",
+    "description": "Ruth Aine is a journalist and media trainer focusing on digital rights, freedom of expression, and storytelling for change.",
+    "interests": "[\"Journalism\",\"Digital Rights\",\"Freedom of Expression\",\"Investigative Reporting\",\"Media Literacy\",\"Training\",\"Storytelling\",\"Public Policy\",\"Open Internet\",\"Community Voice\"]",
+    "profileText": "Ruth Aine",
+    "addedAt": "2025-09-05T15:04:34.538Z"
+  },
+  "32": {
+    "id": "bc9a0115-985e-48bd-a158-205a7d3c70b5",
+    "name": "Brian Musoke",
+    "email": "brian.musoke@example.com",
+    "description": "Brian Musoke is a data scientist specializing in predictive analytics for agriculture and food security.",
+    "interests": "[\"Data Science\",\"Predictive Analytics\",\"Agriculture\",\"Food Security\",\"Remote Sensing\",\"Geospatial Data\",\"Climate Change\",\"Machine Learning\",\"Big Data\",\"Sustainability\"]",
+    "profileText": "Brian Musoke",
+    "addedAt": "2025-09-05T15:04:35.109Z"
+  },
+  "33": {
+    "id": "b64ddb6f-ddfc-4675-b2f5-ef2cbc906495",
+    "name": "Esther Nakato",
+    "email": "esther.nakato@example.com",
+    "description": "Esther Nakato is a digital marketer focused on brand growth and online engagement strategies for startups.",
+    "interests": "[\"Digital Marketing\",\"SEO\",\"Content Strategy\",\"Analytics\",\"Brand Growth\",\"Social Media\",\"Email Marketing\",\"PPC Campaigns\",\"Influencer Marketing\",\"Consumer Behavior\"]",
+    "profileText": "Esther Nakato",
+    "addedAt": "2025-09-05T15:04:35.530Z"
+  },
+  "34": {
+    "id": "9f13ec9f-6cb1-4141-b83d-d5c87c104ca9",
+    "name": "Allan Byaruhanga",
+    "email": "allan.byaruhanga@example.com",
+    "description": "Allan Byaruhanga is a robotics engineer passionate about designing autonomous systems for industrial and agricultural use.",
+    "interests": "[\"Robotics\",\"Autonomous Systems\",\"Industrial Automation\",\"Agricultural Technology\",\"Sensors\",\"AI\",\"Mechanical Design\",\"Electronics\",\"Mechatronics\",\"Control Systems\"]",
+    "profileText": "Allan Byaruhanga",
+    "addedAt": "2025-09-05T15:04:36.108Z"
+  },
+  "35": {
+    "id": "4bdd208c-69d9-4af0-ad37-7a1724cd7840",
+    "name": "Catherine Nabirye",
+    "email": "catherine.nabirye@example.com",
+    "description": "Catherine Nabirye is a humanitarian project manager working with NGOs to coordinate disaster relief and capacity building.",
+    "interests": "[\"Humanitarian Aid\",\"NGOs\",\"Disaster Relief\",\"Project Management\",\"Capacity Building\",\"Community Development\",\"International Relations\",\"Nonprofit Strategy\",\"Resilience\",\"Volunteerism\"]",
+    "profileText": "Catherine Nabirye",
+    "addedAt": "2025-09-05T15:04:36.514Z"
+  },
+  "36": {
+    "id": "b9a4d2ff-9f4b-47c3-8fc4-4bbaec1699df",
+    "name": "David Okello",
+    "email": "david.okello@example.com",
+    "description": "David Okello is a machine learning researcher focused on natural language processing and low-resource languages. He aims to bridge gaps in African linguistics using AI.",
+    "interests": "[\"Machine Learning\",\"Natural Language Processing\",\"Low-resource Languages\",\"Data Science\",\"AI Research\",\"Computational Linguistics\",\"Speech Recognition\",\"Language Models\",\"Deep Learning\",\"Responsible AI\"]",
+    "profileText": "David Okello",
+    "addedAt": "2025-09-05T15:04:37.101Z"
+  },
+  "37": {
+    "id": "d68063b7-6e04-4119-8c3e-21a2b0938ba1",
+    "name": "Isaac Mulindwa",
+    "email": "isaac.mulindwa@example.com",
+    "description": "Isaac Mulindwa is a fintech innovator working on mobile money integrations for unbanked populations in Africa.",
+    "interests": "[\"FinTech\",\"Mobile Money\",\"Payments\",\"Financial Inclusion\",\"APIs\",\"Banking Innovation\",\"Digital Wallets\",\"Blockchain\",\"Consumer Finance\",\"Financial Literacy\"]",
+    "profileText": "Isaac Mulindwa",
+    "addedAt": "2025-09-05T15:04:37.495Z"
+  },
+  "38": {
+    "id": "5ddea4be-c132-4313-a74e-5dc5e4af24f4",
+    "name": "Patricia Adoch",
+    "email": "patricia.adoch@example.com",
+    "description": "Patricia Adoch is a climate activist advocating for renewable energy adoption and sustainable policy frameworks.",
+    "interests": "[\"Climate Change\",\"Renewable Energy\",\"Sustainability\",\"Policy\",\"Activism\",\"Community Engagement\",\"Green Tech\",\"Conservation\",\"Environmental Science\",\"Energy Innovation\"]",
+    "profileText": "Patricia Adoch",
+    "addedAt": "2025-09-05T15:04:38.112Z"
+  },
+  "39": {
+    "id": "5050f0b0-01a6-4fa9-b894-2076c3c51e6a",
+    "name": "Ronald Ssemanda",
+    "email": "ronald.ssemanda@example.com",
+    "description": "Ronald Ssemanda is a game developer creating immersive African-inspired gaming experiences.",
+    "interests": "[\"Game Development\",\"Unity\",\"Unreal Engine\",\"3D Modeling\",\"Animation\",\"Storytelling\",\"Esports\",\"VR Gaming\",\"Interactive Media\",\"Art Direction\"]",
+    "profileText": "Ronald Ssemanda",
+    "addedAt": "2025-09-05T15:04:38.514Z"
+  },
+  "40": {
+    "id": "596f3806-4a04-41c1-a360-1da480010057",
+    "name": "Florence Atwine",
+    "email": "florence.atwine@example.com",
+    "description": "Florence Atwine is a public health expert leveraging data analytics for epidemic tracking and prevention.",
+    "interests": "[\"Public Health\",\"Epidemiology\",\"Data Analytics\",\"Disease Prevention\",\"Healthcare Innovation\",\"Biostatistics\",\"Global Health\",\"Community Awareness\",\"AI in Healthcare\",\"Policy Development\"]",
+    "profileText": "Florence Atwine",
+    "addedAt": "2025-09-05T15:04:39.145Z"
+  },
+  "41": {
+    "id": "3df1c253-324f-4a47-b314-30c8cff29ce9",
+    "name": "Tyra Nankunda",
+    "email": "tyra.nankunda@example.com",
+    "description": "Tyra Nankunda is a social media strategist passionate about shaping narratives and amplifying voices. With a focus on African political landscapes, she designs campaigns that inspire civic engagement and positive influence.",
+    "interests": "[\"Social Media Strategy\",\"Political Communication\",\"Civic Engagement\",\"Community Building\",\"Digital Storytelling\",\"Cultural Narratives\",\"Grassroots Movements\",\"Public Relations\",\"Advocacy\",\"Media Innovation\"]",
+    "profileText": "Tyra Nankunda",
+    "addedAt": "2025-09-09T14:01:19.781Z"
+  },
+  "42": {
+    "id": "27734422-cfd9-47c4-8680-e3b9f48f9cc3",
+    "name": "kalungi rasuli",
+    "email": "kalungi@gmail.com",
+    "description": "Kalungi rasuli is a tech innovator and systems architect based in Uganda. As the CTO of Mibut, he leads the development of intelligent, decentralized platforms focused on education, collaboration, and digital transformation. Passionate about ethical AI and scalable infrastructure, Kalungi builds solutions that bridge real-world impact with cutting-edge technology.",
+    "interests": "[\"Artificial Intelligence\",\"Decentralized Systems\",\"EdTech Innovation\",\"Human-Centered Design\",\"Ethical Technology\",\"Open Source Development\",\"Digital Transformation\",\"Creative Problem Solving\",\"System Architecture\",\"Social Impact through Tech\"]",
+    "profileText": "kalungi rasuli",
+    "addedAt": "2025-09-09T14:01:20.267Z"
+  },
+  "43": {
+    "id": "db227aa5-8219-416c-b644-3d941676ac99",
+    "name": "Michael Kato",
+    "email": "michael.kato@example.com",
+    "description": "Michael Kato is a software engineer specializing in cloud-native applications. He is dedicated to building scalable backend systems and mentoring young developers.",
+    "interests": "[\"Cloud Computing\",\"Backend Development\",\"APIs\",\"Scalable Systems\",\"Mentorship\",\"Open Source\",\"Database Design\",\"Microservices\",\"DevOps\",\"Automation\"]",
+    "profileText": "Michael Kato",
+    "addedAt": "2025-09-09T14:01:20.783Z"
+  },
+  "44": {
+    "id": "d6446264-ac98-4d21-9b55-d7023c62c066",
+    "name": "Sarah Lumu",
+    "email": "sarah.lumu@example.com",
+    "description": "Sarah Lumu is an EdTech entrepreneur creating digital tools for underserved communities. She believes in the power of education to transform societies.",
+    "interests": "[\"Education Technology\",\"Accessibility\",\"Digital Inclusion\",\"Curriculum Innovation\",\"Startups\",\"Female Leadership\",\"Technology for Good\",\"Community Outreach\",\"Mobile Learning\",\"Impact Measurement\"]",
+    "profileText": "Sarah Lumu",
+    "addedAt": "2025-09-09T14:01:21.288Z"
+  },
+  "45": {
+    "id": "9a04b7a3-b84b-42a3-af3c-ec17b1952454",
+    "name": "Grace Namara",
+    "email": "grace.namara@example.com",
+    "description": "Grace Namara is a UX designer passionate about creating intuitive and accessible digital experiences. She thrives at the intersection of design and human psychology.",
+    "interests": "[\"UX Design\",\"Accessibility\",\"Human-Centered Design\",\"Behavioral Psychology\",\"Interaction Design\",\"Prototyping\",\"UI Design\",\"Creative Arts\",\"Inclusive Technology\",\"Digital Wellbeing\"]",
+    "profileText": "Grace Namara",
+    "addedAt": "2025-09-09T14:01:21.811Z"
+  },
+  "46": {
+    "id": "f24ec8ee-ab38-462e-baae-de11cdcd2c5b",
+    "name": "Peter Mugisha",
+    "email": "peter.mugisha@example.com",
+    "description": "Peter Mugisha is a cybersecurity analyst with a focus on threat detection and prevention. He advocates for stronger cybersecurity awareness in Africa.",
+    "interests": "[\"Cybersecurity\",\"Threat Analysis\",\"Incident Response\",\"Network Security\",\"Cloud Security\",\"Cyber Awareness\",\"Penetration Testing\",\"Risk Management\",\"Encryption\",\"Privacy Advocacy\"]",
+    "profileText": "Peter Mugisha",
+    "addedAt": "2025-09-09T14:01:22.313Z"
+  },
+  "47": {
+    "id": "e9116c9f-f46d-4dbf-a106-0633ee543147",
+    "name": "Linda Kyomuhendo",
+    "email": "linda.kyomu@example.com",
+    "description": "Linda Kyomuhendo is a digital artist and storyteller exploring African heritage through new media. She blends technology and culture to inspire creativity.",
+    "interests": "[\"Digital Art\",\"Storytelling\",\"African Heritage\",\"Virtual Reality\",\"Augmented Reality\",\"Film and Media\",\"Creative Coding\",\"Community Arts\",\"Cultural Innovation\",\"3D Design\"]",
+    "profileText": "Linda Kyomuhendo",
+    "addedAt": "2025-09-09T14:01:22.811Z"
+  },
+  "48": {
+    "id": "965f6160-eaf4-4cba-b014-d96dee0c769c",
+    "name": "Samuel Bwogi",
+    "email": "samuel.bwogi@example.com",
+    "description": "Samuel Bwogi is a blockchain developer working on decentralized finance applications. He is passionate about democratizing access to financial systems.",
+    "interests": "[\"Blockchain\",\"DeFi\",\"Smart Contracts\",\"Cryptography\",\"Financial Inclusion\",\"Tokenomics\",\"Decentralization\",\"Open Finance\",\"Web3\",\"Digital Identity\"]",
+    "profileText": "Samuel Bwogi",
+    "addedAt": "2025-09-09T14:01:23.336Z"
+  },
+  "49": {
+    "id": "c1a65c92-7c77-4bd6-b607-22477c94dddd",
+    "name": "Anita Kabugo",
+    "email": "anita.kabugo@example.com",
+    "description": "Anita Kabugo is a healthcare innovator leveraging digital health platforms to improve patient outcomes and data-driven medical research.",
+    "interests": "[\"Digital Health\",\"Patient Care\",\"Medical Data\",\"Telemedicine\",\"Wearable Devices\",\"Healthcare Policy\",\"AI in Medicine\",\"Clinical Research\",\"Community Health\",\"EHR Systems\"]",
+    "profileText": "Anita Kabugo",
+    "addedAt": "2025-09-09T14:01:23.809Z"
+  },
+  "50": {
+    "id": "cd6b8133-0742-4726-bc51-0d5c9d1f0365",
+    "name": "James Tumwine",
+    "email": "james.tumwine@example.com",
+    "description": "James Tumwine is an economist researching digital economies and how technology reshapes trade in Africa.",
+    "interests": "[\"Economics\",\"Digital Trade\",\"FinTech\",\"Data-Driven Policy\",\"Global Markets\",\"Sustainable Growth\",\"Innovation Policy\",\"Business Intelligence\",\"Financial Modeling\",\"Economic Development\"]",
+    "profileText": "James Tumwine",
+    "addedAt": "2025-09-09T14:01:24.404Z"
+  },
+  "51": {
+    "id": "c886229e-6593-46d3-949f-69900ab5e5be",
+    "name": "Ruth Aine",
+    "email": "ruth.aine@example.com",
+    "description": "Ruth Aine is a journalist and media trainer focusing on digital rights, freedom of expression, and storytelling for change.",
+    "interests": "[\"Journalism\",\"Digital Rights\",\"Freedom of Expression\",\"Investigative Reporting\",\"Media Literacy\",\"Training\",\"Storytelling\",\"Public Policy\",\"Open Internet\",\"Community Voice\"]",
+    "profileText": "Ruth Aine",
+    "addedAt": "2025-09-09T14:01:24.840Z"
+  },
+  "52": {
+    "id": "bc9a0115-985e-48bd-a158-205a7d3c70b5",
+    "name": "Brian Musoke",
+    "email": "brian.musoke@example.com",
+    "description": "Brian Musoke is a data scientist specializing in predictive analytics for agriculture and food security.",
+    "interests": "[\"Data Science\",\"Predictive Analytics\",\"Agriculture\",\"Food Security\",\"Remote Sensing\",\"Geospatial Data\",\"Climate Change\",\"Machine Learning\",\"Big Data\",\"Sustainability\"]",
+    "profileText": "Brian Musoke",
+    "addedAt": "2025-09-09T14:01:25.393Z"
+  },
+  "53": {
+    "id": "b64ddb6f-ddfc-4675-b2f5-ef2cbc906495",
+    "name": "Esther Nakato",
+    "email": "esther.nakato@example.com",
+    "description": "Esther Nakato is a digital marketer focused on brand growth and online engagement strategies for startups.",
+    "interests": "[\"Digital Marketing\",\"SEO\",\"Content Strategy\",\"Analytics\",\"Brand Growth\",\"Social Media\",\"Email Marketing\",\"PPC Campaigns\",\"Influencer Marketing\",\"Consumer Behavior\"]",
+    "profileText": "Esther Nakato",
+    "addedAt": "2025-09-09T14:01:25.834Z"
+  },
+  "54": {
+    "id": "9f13ec9f-6cb1-4141-b83d-d5c87c104ca9",
+    "name": "Allan Byaruhanga",
+    "email": "allan.byaruhanga@example.com",
+    "description": "Allan Byaruhanga is a robotics engineer passionate about designing autonomous systems for industrial and agricultural use.",
+    "interests": "[\"Robotics\",\"Autonomous Systems\",\"Industrial Automation\",\"Agricultural Technology\",\"Sensors\",\"AI\",\"Mechanical Design\",\"Electronics\",\"Mechatronics\",\"Control Systems\"]",
+    "profileText": "Allan Byaruhanga",
+    "addedAt": "2025-09-09T14:01:26.405Z"
+  },
+  "55": {
+    "id": "4bdd208c-69d9-4af0-ad37-7a1724cd7840",
+    "name": "Catherine Nabirye",
+    "email": "catherine.nabirye@example.com",
+    "description": "Catherine Nabirye is a humanitarian project manager working with NGOs to coordinate disaster relief and capacity building.",
+    "interests": "[\"Humanitarian Aid\",\"NGOs\",\"Disaster Relief\",\"Project Management\",\"Capacity Building\",\"Community Development\",\"International Relations\",\"Nonprofit Strategy\",\"Resilience\",\"Volunteerism\"]",
+    "profileText": "Catherine Nabirye",
+    "addedAt": "2025-09-09T14:01:26.826Z"
+  },
+  "56": {
+    "id": "b9a4d2ff-9f4b-47c3-8fc4-4bbaec1699df",
+    "name": "David Okello",
+    "email": "david.okello@example.com",
+    "description": "David Okello is a machine learning researcher focused on natural language processing and low-resource languages. He aims to bridge gaps in African linguistics using AI.",
+    "interests": "[\"Machine Learning\",\"Natural Language Processing\",\"Low-resource Languages\",\"Data Science\",\"AI Research\",\"Computational Linguistics\",\"Speech Recognition\",\"Language Models\",\"Deep Learning\",\"Responsible AI\"]",
+    "profileText": "David Okello",
+    "addedAt": "2025-09-09T14:01:27.396Z"
+  },
+  "57": {
+    "id": "d68063b7-6e04-4119-8c3e-21a2b0938ba1",
+    "name": "Isaac Mulindwa",
+    "email": "isaac.mulindwa@example.com",
+    "description": "Isaac Mulindwa is a fintech innovator working on mobile money integrations for unbanked populations in Africa.",
+    "interests": "[\"FinTech\",\"Mobile Money\",\"Payments\",\"Financial Inclusion\",\"APIs\",\"Banking Innovation\",\"Digital Wallets\",\"Blockchain\",\"Consumer Finance\",\"Financial Literacy\"]",
+    "profileText": "Isaac Mulindwa",
+    "addedAt": "2025-09-09T14:01:27.802Z"
+  },
+  "58": {
+    "id": "5ddea4be-c132-4313-a74e-5dc5e4af24f4",
+    "name": "Patricia Adoch",
+    "email": "patricia.adoch@example.com",
+    "description": "Patricia Adoch is a climate activist advocating for renewable energy adoption and sustainable policy frameworks.",
+    "interests": "[\"Climate Change\",\"Renewable Energy\",\"Sustainability\",\"Policy\",\"Activism\",\"Community Engagement\",\"Green Tech\",\"Conservation\",\"Environmental Science\",\"Energy Innovation\"]",
+    "profileText": "Patricia Adoch",
+    "addedAt": "2025-09-09T14:01:28.385Z"
+  },
+  "59": {
+    "id": "5050f0b0-01a6-4fa9-b894-2076c3c51e6a",
+    "name": "Ronald Ssemanda",
+    "email": "ronald.ssemanda@example.com",
+    "description": "Ronald Ssemanda is a game developer creating immersive African-inspired gaming experiences.",
+    "interests": "[\"Game Development\",\"Unity\",\"Unreal Engine\",\"3D Modeling\",\"Animation\",\"Storytelling\",\"Esports\",\"VR Gaming\",\"Interactive Media\",\"Art Direction\"]",
+    "profileText": "Ronald Ssemanda",
+    "addedAt": "2025-09-09T14:01:28.794Z"
+  },
+  "60": {
+    "id": "596f3806-4a04-41c1-a360-1da480010057",
+    "name": "Florence Atwine",
+    "email": "florence.atwine@example.com",
+    "description": "Florence Atwine is a public health expert leveraging data analytics for epidemic tracking and prevention.",
+    "interests": "[\"Public Health\",\"Epidemiology\",\"Data Analytics\",\"Disease Prevention\",\"Healthcare Innovation\",\"Biostatistics\",\"Global Health\",\"Community Awareness\",\"AI in Healthcare\",\"Policy Development\"]",
+    "profileText": "Florence Atwine",
+    "addedAt": "2025-09-09T14:01:29.385Z"
+  },
+  "61": {
+    "name": "Test User",
+    "email": "testuser@example.com",
+    "description": "Experienced software engineer with 5 years of React and Node.js development. Passionate about building scalable web applications and mentoring junior developers.",
+    "interests": [
+      "web development",
+      "UI/UX",
+      "open source",
+      "tech meetups"
+    ],
+    "location": "San Francisco",
+    "skills": [
+      "developer",
+      "software",
+      "engineer",
+      "react",
+      "node",
+      "ux",
+      "ui"
+    ],
+    "profession": "software engineer",
+    "profileText": "Name: Test User\n\nProfession: software engineer\n\nBio: Experienced software engineer with 5 years of React and Node.js development. Passionate about building scalable web applications and mentoring junior developers.\n\nInterests: web development, UI/UX, open source, tech meetups\n\nSkills: developer, software, engineer, react, node, ux, ui\n\nLocation: San Francisco",
+    "addedAt": "2025-09-09T14:31:23.153Z"
+  },
+  "62": {
+    "name": "Test User",
+    "email": "testuser@example.com",
+    "description": "Experienced software engineer with 5 years of React and Node.js development. Passionate about building scalable web applications and mentoring junior developers.",
+    "interests": [
+      "web development",
+      "UI/UX",
+      "open source",
+      "tech meetups"
+    ],
+    "location": "San Francisco",
+    "skills": [
+      "developer",
+      "software",
+      "engineer",
+      "react",
+      "node",
+      "ux",
+      "ui"
+    ],
+    "profession": "software engineer",
+    "profileText": "Name: Test User\n\nProfession: software engineer\n\nBio: Experienced software engineer with 5 years of React and Node.js development. Passionate about building scalable web applications and mentoring junior developers.\n\nInterests: web development, UI/UX, open source, tech meetups\n\nSkills: developer, software, engineer, react, node, ux, ui\n\nLocation: San Francisco",
+    "addedAt": "2025-09-09T14:37:50.369Z"
+  },
+  "63": {
+    "name": "Test User",
+    "email": "testuser@example.com",
+    "description": "Experienced software engineer with 5 years of React and Node.js development. Passionate about building scalable web applications and mentoring junior developers.",
+    "interests": [
+      "web development",
+      "UI/UX",
+      "open source",
+      "tech meetups"
+    ],
+    "location": "San Francisco",
+    "skills": [
+      "developer",
+      "software",
+      "engineer",
+      "react",
+      "node",
+      "ux",
+      "ui"
+    ],
+    "profession": "software engineer",
+    "profileText": "Name: Test User\n\nProfession: software engineer\n\nBio: Experienced software engineer with 5 years of React and Node.js development. Passionate about building scalable web applications and mentoring junior developers.\n\nInterests: web development, UI/UX, open source, tech meetups\n\nSkills: developer, software, engineer, react, node, ux, ui\n\nLocation: San Francisco",
+    "addedAt": "2025-09-09T14:38:20.169Z"
+  },
+  "64": {
+    "name": "Test User",
+    "email": "testuser@example.com",
+    "description": "Experienced software engineer with 5 years of React and Node.js development. Passionate about building scalable web applications and mentoring junior developers.",
+    "interests": [
+      "web development",
+      "UI/UX",
+      "open source",
+      "tech meetups"
+    ],
+    "location": "San Francisco",
+    "skills": [
+      "developer",
+      "software",
+      "engineer",
+      "react",
+      "node",
+      "ux",
+      "ui"
+    ],
+    "profession": "software engineer",
+    "profileText": "Name: Test User\n\nProfession: software engineer\n\nBio: Experienced software engineer with 5 years of React and Node.js development. Passionate about building scalable web applications and mentoring junior developers.\n\nInterests: web development, UI/UX, open source, tech meetups\n\nSkills: developer, software, engineer, react, node, ux, ui\n\nLocation: San Francisco",
+    "addedAt": "2025-09-09T14:39:51.709Z"
+  },
+  "65": {
+    "name": "Test User",
+    "email": "testuser@example.com",
+    "description": "Experienced software engineer with 5 years of React and Node.js development. Passionate about building scalable web applications and mentoring junior developers.",
+    "interests": [
+      "web development",
+      "UI/UX",
+      "open source",
+      "tech meetups"
+    ],
+    "location": "San Francisco",
+    "skills": [
+      "developer",
+      "software",
+      "engineer",
+      "react",
+      "node",
+      "ux",
+      "ui"
+    ],
+    "profession": "software engineer",
+    "profileText": "Name: Test User\n\nProfession: software engineer\n\nBio: Experienced software engineer with 5 years of React and Node.js development. Passionate about building scalable web applications and mentoring junior developers.\n\nInterests: web development, UI/UX, open source, tech meetups\n\nSkills: developer, software, engineer, react, node, ux, ui\n\nLocation: San Francisco",
+    "addedAt": "2025-09-09T14:43:49.965Z"
+  },
+  "66": {
+    "name": "John Doe",
+    "description": "Senior software engineer with 8 years of experience in full-stack development. Proficient in React, Node.js, and AWS cloud architecture. Led multiple agile teams and implemented CI/CD pipelines for enterprise applications. Passionate about clean code and microservices architecture.",
+    "interests": [
+      "Cloud Computing",
+      "DevOps",
+      "Software Architecture"
+    ],
+    "skills": [
+      "software",
+      "engineer",
+      "code",
+      "react",
+      "node",
+      "aws",
+      "cloud",
+      "devops",
+      "ci/cd",
+      "agile",
+      "full"
+    ],
+    "profession": "software engineer",
+    "profileText": "Name: John Doe\n\nProfession: software engineer\n\nBio: Senior software engineer with 8 years of experience in full-stack development. Proficient in React, Node.js, and AWS cloud architecture. Led multiple agile teams and implemented CI/CD pipelines for enterprise applications. Passionate about clean code and microservices architecture.\n\nInterests: Cloud Computing, DevOps, Software Architecture\n\nSkills: software, engineer, code, react, node, aws, cloud, devops, ci/cd, agile, full\n\nLocation: ",
+    "addedAt": "2025-09-09T14:45:03.120Z"
+  },
+  "67": {
+    "name": "Test User",
+    "email": "testuser@example.com",
+    "description": "Experienced software engineer with 5 years of React and Node.js development. Passionate about building scalable web applications and mentoring junior developers.",
+    "interests": [
+      "web development",
+      "UI/UX",
+      "open source",
+      "tech meetups"
+    ],
+    "location": "San Francisco",
+    "skills": [
+      "developer",
+      "software",
+      "engineer",
+      "react",
+      "node",
+      "ux",
+      "ui"
+    ],
+    "profession": "software engineer",
+    "profileText": "Name: Test User\n\nProfession: software engineer\n\nBio: Experienced software engineer with 5 years of React and Node.js development. Passionate about building scalable web applications and mentoring junior developers.\n\nInterests: web development, UI/UX, open source, tech meetups\n\nSkills: developer, software, engineer, react, node, ux, ui\n\nLocation: San Francisco",
+    "addedAt": "2025-09-09T14:50:21.012Z"
+  },
+  "68": {
+    "name": "Mary Namutebi",
+    "email": "mary.namutebi@example.com",
+    "description": "Experienced smallholder farmer specializing in maize and bean production. Skilled in sustainable agriculture, crop rotation, and modern irrigation techniques. Passionate about improving food security and mentoring young farmers.",
+    "interests": [
+      "sustainable agriculture",
+      "crop management",
+      "irrigation",
+      "organic farming",
+      "agro-tech"
+    ],
+    "location": "Kampala, Uganda",
+    "skills": [
+      "ai",
+      "agriculture",
+      "farming",
+      "sustainable",
+      "organic",
+      "production",
+      "crop",
+      "rotation",
+      "and",
+      "modern",
+      "irrigation",
+      "techniques"
+    ],
+    "profession": "farmer",
+    "profileText": "Name: Mary Namutebi\n\nProfession: farmer\n\nBio: Experienced smallholder farmer specializing in maize and bean production. Skilled in sustainable agriculture, crop rotation, and modern irrigation techniques. Passionate about improving food security and mentoring young farmers.\n\nInterests: sustainable agriculture, crop management, irrigation, organic farming, agro-tech\n\nSkills: ai, agriculture, farming, sustainable, organic, production, crop, rotation, and, modern, irrigation, techniques\n\nLocation: Kampala, Uganda",
+    "addedAt": "2025-09-09T14:50:58.217Z"
+  },
+  "69": {
+    "name": "Mary Namutebi",
+    "email": "mary.namutebi@example.com",
+    "description": "Experienced smallholder farmer specializing in maize and bean production. Skilled in sustainable agriculture, crop rotation, and modern irrigation techniques. Passionate about improving food security and mentoring young farmers.",
+    "interests": [
+      "sustainable agriculture",
+      "crop management",
+      "irrigation",
+      "organic farming",
+      "agro-tech"
+    ],
+    "location": "Kampala, Uganda",
+    "skills": [
+      "ai",
+      "agriculture",
+      "farming",
+      "sustainable",
+      "organic",
+      "production",
+      "crop",
+      "rotation",
+      "and",
+      "modern",
+      "irrigation",
+      "techniques"
+    ],
+    "profession": "farmer",
+    "profileText": "Name: Mary Namutebi\n\nProfession: farmer\n\nBio: Experienced smallholder farmer specializing in maize and bean production. Skilled in sustainable agriculture, crop rotation, and modern irrigation techniques. Passionate about improving food security and mentoring young farmers.\n\nInterests: sustainable agriculture, crop management, irrigation, organic farming, agro-tech\n\nSkills: ai, agriculture, farming, sustainable, organic, production, crop, rotation, and, modern, irrigation, techniques\n\nLocation: Kampala, Uganda",
+    "addedAt": "2025-09-09T14:51:11.248Z"
+  },
+  "70": {
+    "name": "Mary Namutebi",
+    "email": "mary.namutebi@example.com",
+    "description": "Experienced smallholder farmer specializing in maize and bean production. Skilled in sustainable agriculture, crop rotation, and modern irrigation techniques. Passionate about improving food security and mentoring young farmers.",
+    "interests": [
+      "sustainable agriculture",
+      "crop management",
+      "irrigation",
+      "organic farming",
+      "agro-tech"
+    ],
+    "location": "Kampala, Uganda",
+    "skills": [
+      "ai",
+      "agriculture",
+      "farming",
+      "sustainable",
+      "organic",
+      "production",
+      "crop",
+      "rotation",
+      "and",
+      "modern",
+      "irrigation",
+      "techniques"
+    ],
+    "profession": "farmer",
+    "profileText": "Name: Mary Namutebi\n\nProfession: farmer\n\nBio: Experienced smallholder farmer specializing in maize and bean production. Skilled in sustainable agriculture, crop rotation, and modern irrigation techniques. Passionate about improving food security and mentoring young farmers.\n\nInterests: sustainable agriculture, crop management, irrigation, organic farming, agro-tech\n\nSkills: ai, agriculture, farming, sustainable, organic, production, crop, rotation, and, modern, irrigation, techniques\n\nLocation: Kampala, Uganda",
+    "addedAt": "2025-09-09T14:51:47.953Z"
+  },
+  "71": {
+    "name": "Mary Namutebi",
+    "email": "mary.namutebi@example.com",
+    "description": "Experienced smallholder farmer specializing in maize and bean production. Skilled in sustainable agriculture, crop rotation, and modern irrigation techniques. Passionate about improving food security and mentoring young farmers.",
+    "interests": [
+      "sustainable agriculture",
+      "crop management",
+      "irrigation",
+      "organic farming",
+      "agro-tech"
+    ],
+    "location": "Kampala, Uganda",
+    "skills": [
+      "ai",
+      "agriculture",
+      "farming",
+      "sustainable",
+      "organic",
+      "production",
+      "crop",
+      "rotation",
+      "and",
+      "modern",
+      "irrigation",
+      "techniques"
+    ],
+    "profession": "farmer",
+    "profileText": "Name: Mary Namutebi\n\nProfession: farmer\n\nBio: Experienced smallholder farmer specializing in maize and bean production. Skilled in sustainable agriculture, crop rotation, and modern irrigation techniques. Passionate about improving food security and mentoring young farmers.\n\nInterests: sustainable agriculture, crop management, irrigation, organic farming, agro-tech\n\nSkills: ai, agriculture, farming, sustainable, organic, production, crop, rotation, and, modern, irrigation, techniques\n\nLocation: Kampala, Uganda",
+    "addedAt": "2025-09-09T14:53:54.102Z"
+  },
+  "72": {
+    "name": "Mary Namutebi",
+    "email": "mary.namutebi@example.com",
+    "description": "Experienced smallholder farmer specializing in maize and bean production. Skilled in sustainable agriculture, crop rotation, and modern irrigation techniques. Passionate about improving food security and mentoring young farmers.",
+    "interests": [
+      "sustainable agriculture",
+      "crop management",
+      "irrigation",
+      "organic farming",
+      "agro-tech"
+    ],
+    "location": "Kampala, Uganda",
+    "skills": [
+      "ai",
+      "agriculture",
+      "farming",
+      "sustainable",
+      "organic",
+      "production",
+      "crop",
+      "rotation",
+      "and",
+      "modern",
+      "irrigation",
+      "techniques"
+    ],
+    "profession": "farmer",
+    "profileText": "Name: Mary Namutebi\n\nProfession: farmer\n\nBio: Experienced smallholder farmer specializing in maize and bean production. Skilled in sustainable agriculture, crop rotation, and modern irrigation techniques. Passionate about improving food security and mentoring young farmers.\n\nInterests: sustainable agriculture, crop management, irrigation, organic farming, agro-tech\n\nSkills: ai, agriculture, farming, sustainable, organic, production, crop, rotation, and, modern, irrigation, techniques\n\nLocation: Kampala, Uganda",
+    "addedAt": "2025-09-09T15:03:19.486Z"
+  },
+  "73": {
+    "name": "Mary Namutebi",
+    "email": "mary.namutebi@example.com",
+    "description": "Experienced smallholder farmer specializing in maize and bean production. Skilled in sustainable agriculture, crop rotation, and modern irrigation techniques. Passionate about improving food security and mentoring young farmers.",
+    "interests": [
+      "sustainable agriculture",
+      "crop management",
+      "irrigation",
+      "organic farming",
+      "agro-tech"
+    ],
+    "location": "Kampala, Uganda",
+    "skills": [
+      "ai",
+      "agriculture",
+      "farming",
+      "sustainable",
+      "organic",
+      "production",
+      "crop",
+      "rotation",
+      "and",
+      "modern",
+      "irrigation",
+      "techniques"
+    ],
+    "profession": "farmer",
+    "profileText": "Name: Mary Namutebi\n\nProfession: farmer\n\nBio: Experienced smallholder farmer specializing in maize and bean production. Skilled in sustainable agriculture, crop rotation, and modern irrigation techniques. Passionate about improving food security and mentoring young farmers.\n\nInterests: sustainable agriculture, crop management, irrigation, organic farming, agro-tech\n\nSkills: ai, agriculture, farming, sustainable, organic, production, crop, rotation, and, modern, irrigation, techniques\n\nLocation: Kampala, Uganda",
+    "addedAt": "2025-09-09T15:04:31.547Z"
+  },
+  "74": {
+    "name": "Mary Namutebi",
+    "email": "mary.namutebi@example.com",
+    "description": "Experienced smallholder farmer specializing in maize and bean production. Skilled in sustainable agriculture, crop rotation, and modern irrigation techniques. Passionate about improving food security and mentoring young farmers.",
+    "interests": [
+      "sustainable agriculture",
+      "crop management",
+      "irrigation",
+      "organic farming",
+      "agro-tech"
+    ],
+    "location": "Kampala, Uganda",
+    "skills": [
+      "ai",
+      "agriculture",
+      "farming",
+      "sustainable",
+      "organic",
+      "production",
+      "crop",
+      "rotation",
+      "and",
+      "modern",
+      "irrigation",
+      "techniques"
+    ],
+    "profession": "farmer",
+    "profileText": "Name: Mary Namutebi\n\nProfession: farmer\n\nBio: Experienced smallholder farmer specializing in maize and bean production. Skilled in sustainable agriculture, crop rotation, and modern irrigation techniques. Passionate about improving food security and mentoring young farmers.\n\nInterests: sustainable agriculture, crop management, irrigation, organic farming, agro-tech\n\nSkills: ai, agriculture, farming, sustainable, organic, production, crop, rotation, and, modern, irrigation, techniques\n\nLocation: Kampala, Uganda",
+    "addedAt": "2025-09-09T15:04:54.451Z"
+  },
+  "75": {
+    "name": "Mary Namutebi",
+    "email": "mary.namutebi@example.com",
+    "description": "Experienced smallholder farmer specializing in maize and bean production. Skilled in sustainable agriculture, crop rotation, and modern irrigation techniques. Passionate about improving food security and mentoring young farmers.",
+    "interests": [
+      "sustainable agriculture",
+      "crop management",
+      "irrigation",
+      "organic farming",
+      "agro-tech"
+    ],
+    "location": "Kampala, Uganda",
+    "skills": [
+      "ai",
+      "agriculture",
+      "farming",
+      "sustainable",
+      "organic",
+      "production",
+      "crop",
+      "rotation",
+      "and",
+      "modern",
+      "irrigation",
+      "techniques"
+    ],
+    "profession": "farmer",
+    "profileText": "Name: Mary Namutebi\n\nProfession: farmer\n\nBio: Experienced smallholder farmer specializing in maize and bean production. Skilled in sustainable agriculture, crop rotation, and modern irrigation techniques. Passionate about improving food security and mentoring young farmers.\n\nInterests: sustainable agriculture, crop management, irrigation, organic farming, agro-tech\n\nSkills: ai, agriculture, farming, sustainable, organic, production, crop, rotation, and, modern, irrigation, techniques\n\nLocation: Kampala, Uganda",
+    "addedAt": "2025-09-09T15:06:15.832Z"
+  },
+  "76": {
+    "name": "Mary Namutebi",
+    "email": "mary.namutebi@example.com",
+    "description": "Experienced smallholder farmer specializing in maize and bean production. Skilled in sustainable agriculture, crop rotation, and modern irrigation techniques. Passionate about improving food security and mentoring young farmers.",
+    "interests": [
+      "sustainable agriculture",
+      "crop management",
+      "irrigation",
+      "organic farming",
+      "agro-tech"
+    ],
+    "location": "Kampala, Uganda",
+    "skills": [
+      "ai",
+      "agriculture",
+      "farming",
+      "sustainable",
+      "organic",
+      "production",
+      "crop",
+      "rotation",
+      "and",
+      "modern",
+      "irrigation",
+      "techniques"
+    ],
+    "profession": "farmer",
+    "profileText": "Name: Mary Namutebi\n\nProfession: farmer\n\nBio: Experienced smallholder farmer specializing in maize and bean production. Skilled in sustainable agriculture, crop rotation, and modern irrigation techniques. Passionate about improving food security and mentoring young farmers.\n\nInterests: sustainable agriculture, crop management, irrigation, organic farming, agro-tech\n\nSkills: ai, agriculture, farming, sustainable, organic, production, crop, rotation, and, modern, irrigation, techniques\n\nLocation: Kampala, Uganda",
+    "addedAt": "2025-09-09T15:06:33.751Z"
+  },
+  "77": {
+    "name": "Mary Namutebi",
+    "email": "mary.namutebi@example.com",
+    "description": "Experienced smallholder farmer specializing in maize and bean production. Skilled in sustainable agriculture, crop rotation, and modern irrigation techniques. Passionate about improving food security and mentoring young farmers.",
+    "interests": [
+      "sustainable agriculture",
+      "crop management",
+      "irrigation",
+      "organic farming",
+      "agro-tech"
+    ],
+    "location": "Kampala, Uganda",
+    "skills": [
+      "ai",
+      "agriculture",
+      "farming",
+      "sustainable",
+      "organic",
+      "production",
+      "crop",
+      "rotation",
+      "and",
+      "modern",
+      "irrigation",
+      "techniques"
+    ],
+    "profession": "farmer",
+    "profileText": "Name: Mary Namutebi\n\nProfession: farmer\n\nBio: Experienced smallholder farmer specializing in maize and bean production. Skilled in sustainable agriculture, crop rotation, and modern irrigation techniques. Passionate about improving food security and mentoring young farmers.\n\nInterests: sustainable agriculture, crop management, irrigation, organic farming, agro-tech\n\nSkills: ai, agriculture, farming, sustainable, organic, production, crop, rotation, and, modern, irrigation, techniques\n\nLocation: Kampala, Uganda",
+    "addedAt": "2025-09-09T15:08:02.358Z"
+  },
+  "78": {
+    "name": "Mary Namutebi",
+    "email": "mary.namutebi@example.com",
+    "description": "Experienced smallholder farmer specializing in maize and bean production. Skilled in sustainable agriculture, crop rotation, and modern irrigation techniques. Passionate about improving food security and mentoring young farmers.",
+    "interests": [
+      "sustainable agriculture",
+      "crop management",
+      "irrigation",
+      "organic farming",
+      "agro-tech"
+    ],
+    "location": "Kampala, Uganda",
+    "skills": [
+      "ai",
+      "agriculture",
+      "farming",
+      "sustainable",
+      "organic",
+      "production",
+      "crop",
+      "rotation",
+      "and",
+      "modern",
+      "irrigation",
+      "techniques"
+    ],
+    "profession": "farmer",
+    "profileText": "Name: Mary Namutebi\n\nProfession: farmer\n\nBio: Experienced smallholder farmer specializing in maize and bean production. Skilled in sustainable agriculture, crop rotation, and modern irrigation techniques. Passionate about improving food security and mentoring young farmers.\n\nInterests: sustainable agriculture, crop management, irrigation, organic farming, agro-tech\n\nSkills: ai, agriculture, farming, sustainable, organic, production, crop, rotation, and, modern, irrigation, techniques\n\nLocation: Kampala, Uganda",
+    "addedAt": "2025-09-09T15:10:30.418Z"
+  },
+  "79": {
+    "name": "Mary Namutebi",
+    "email": "mary.namutebi@example.com",
+    "description": "Experienced smallholder farmer specializing in maize and bean production. Skilled in sustainable agriculture, crop rotation, and modern irrigation techniques. Passionate about improving food security and mentoring young farmers.",
+    "interests": [
+      "sustainable agriculture",
+      "crop management",
+      "irrigation",
+      "organic farming",
+      "agro-tech"
+    ],
+    "location": "Kampala, Uganda",
+    "skills": [
+      "ai",
+      "agriculture",
+      "farming",
+      "sustainable",
+      "organic",
+      "production",
+      "crop",
+      "rotation",
+      "and",
+      "modern",
+      "irrigation",
+      "techniques"
+    ],
+    "profession": "farmer",
+    "profileText": "Name: Mary Namutebi\n\nProfession: farmer\n\nBio: Experienced smallholder farmer specializing in maize and bean production. Skilled in sustainable agriculture, crop rotation, and modern irrigation techniques. Passionate about improving food security and mentoring young farmers.\n\nInterests: sustainable agriculture, crop management, irrigation, organic farming, agro-tech\n\nSkills: ai, agriculture, farming, sustainable, organic, production, crop, rotation, and, modern, irrigation, techniques\n\nLocation: Kampala, Uganda",
+    "addedAt": "2025-09-09T15:12:17.377Z"
+  }
+}

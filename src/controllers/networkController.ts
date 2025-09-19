@@ -599,6 +599,19 @@ export async function approveMember(
       return res.status(403).json({ message: 'Only admins and moderators can approve new members' });
     }
 
+    // Check if user is already a member
+    const existingMember = await sql<NetworkMember[]>`
+      SELECT * FROM network_members
+      WHERE network_id = ${networkId} AND user_id = ${newMemberId}
+    `;
+
+    if (existingMember.length > 0) {
+      return res.status(409).json({ 
+        message: 'User is already a member of this network',
+        member: existingMember[0]
+      });
+    }
+
     // Add the new member
     const result = await sql<NetworkMember[]>`
       INSERT INTO network_members (
@@ -639,12 +652,65 @@ export async function approveMember(
       member: result[0]
     });
   } catch (error) {
+    // Handle specific database constraint violations
+    if (error instanceof Error) {
+      // Check for duplicate key constraint violation
+      if (error.message.includes('duplicate key value violates unique constraint') && 
+          error.message.includes('network_members_network_id_user_id_key')) {
+        logger.warn('Attempted to approve user who is already a member', {
+          networkId,
+          newMemberId,
+          approverId,
+          error: error.message
+        });
+        return res.status(409).json({ 
+          message: 'User is already a member of this network',
+          error: 'DUPLICATE_MEMBER'
+        });
+      }
+      
+      // Check for foreign key constraint violations
+      if (error.message.includes('violates foreign key constraint')) {
+        if (error.message.includes('network_members_network_id_fkey')) {
+          logger.error('Invalid network ID in member approval', {
+            networkId,
+            newMemberId,
+            approverId,
+            error: error.message
+          });
+          return res.status(404).json({ 
+            message: 'Network not found',
+            error: 'NETWORK_NOT_FOUND'
+          });
+        }
+        if (error.message.includes('network_members_user_id_fkey')) {
+          logger.error('Invalid user ID in member approval', {
+            networkId,
+            newMemberId,
+            approverId,
+            error: error.message
+          });
+          return res.status(404).json({ 
+            message: 'User not found',
+            error: 'USER_NOT_FOUND'
+          });
+        }
+      }
+    }
+    
+    // Log the full error for debugging
     logger.error('Failed to approve new member', {
       networkId,
       newMemberId,
-      error: error instanceof Error ? error.message : 'Unknown error'
+      approverId,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
     });
-    res.status(500).json({ message: 'Failed to approve new member' });
+    
+    res.status(500).json({ 
+      message: 'Failed to approve new member',
+      error: 'INTERNAL_SERVER_ERROR'
+    });
   }
 }
 
@@ -820,7 +886,7 @@ export async function requestJoin(
   res: Response
 ) {
   const { id: networkId } = req.params;
-  const { passcode } = req.body?req.body as JoinRequestBody:{};
+  const { passcode } = (req.body as JoinRequestBody) || {};
   const userId = req.user?.id;
 
   if (!userId) {
@@ -1001,6 +1067,22 @@ export async function handleJoinRequest(
 
     const updatedRequest = await sql.begin(async sql => {
       if (action === 'approve') {
+        // Check if user is already a member before adding
+        const existingMember = await sql<NetworkMember[]>`
+          SELECT * FROM network_members
+          WHERE network_id = ${networkId} AND user_id = ${request.user_id}
+        `;
+
+        if (existingMember.length > 0) {
+          // User is already a member, just update the request status
+          await sql`
+            UPDATE pending_network_joins
+            SET status = 'approved'
+            WHERE id = ${requestId}
+          `;
+          return { ...request, alreadyMember: true };
+        }
+
         // Add as member and update request status
         await sql`
           INSERT INTO network_members (network_id, user_id, role)
@@ -1053,14 +1135,44 @@ export async function handleJoinRequest(
       data: { networkId }
     });
 
-    res.json({ message: `Join request ${action}ed` });
+    const responseMessage = updatedRequest.alreadyMember 
+      ? 'Join request approved (user was already a member)'
+      : `Join request ${action}ed`;
+    
+    res.json({ 
+      message: responseMessage,
+      alreadyMember: updatedRequest.alreadyMember || false
+    });
   } catch (error) {
+    // Handle specific database constraint violations
+    if (error instanceof Error) {
+      // Check for duplicate key constraint violation
+      if (error.message.includes('duplicate key value violates unique constraint') && 
+          error.message.includes('network_members_network_id_user_id_key')) {
+        logger.warn('Attempted to approve user who is already a member via join request', {
+            networkId,
+            requestId,
+            adminId,
+            error: error.message
+          });
+        return res.status(409).json({ 
+          message: 'User is already a member of this network',
+          error: 'DUPLICATE_MEMBER'
+        });
+      }
+    }
+    
     logger.error('Failed to handle join request', {
       networkId,
       requestId,
-      error: error instanceof Error ? error.message : 'Unknown error'
+      adminId,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
     });
-    res.status(500).json({ message: 'Failed to handle join request' });
+    res.status(500).json({ 
+      message: 'Failed to handle join request',
+      error: 'INTERNAL_SERVER_ERROR'
+    });
   }
 }
 
@@ -1885,4 +1997,265 @@ async function emitNetworkActivity(networkId: string, activity: {
   }
   
   await cacheSet(cacheKey, recentActivity, 24 * 60 * 60); // Cache for 24 hours
+}
+
+export async function suspendNetwork(
+  req: AuthRequest,
+  res: Response
+) {
+  try {
+    const { id: networkId } = req.params;
+    const userId = req.user!.id;
+
+    if (!isValidUUID(networkId)) {
+      return res.status(400).json({ error: 'Invalid network ID format' });
+    }
+
+    // Check if network exists
+    const network = await sql<Network[]>`
+      SELECT * FROM networks WHERE id = ${networkId}
+    `;
+
+    if (network.length === 0) {
+      return res.status(404).json({ error: 'Network not found' });
+    }
+
+    // Check if network is already suspended
+    if (network[0].suspension_status !== 'active') {
+      return res.status(400).json({ error: 'Network is already suspended' });
+    }
+
+    // Check if user is creator or admin
+    const member = await sql<NetworkMember[]>`
+      SELECT role FROM network_members 
+      WHERE network_id = ${networkId} AND user_id = ${userId}
+    `;
+
+    if (member.length === 0 || !['creator', 'admin'].includes(member[0].role)) {
+      return res.status(403).json({ error: 'Only network creators and admins can suspend networks' });
+    }
+
+    // Generate suspension token for reclaim
+    const suspensionToken = crypto.randomUUID();
+    const suspensionExpiresAt = new Date();
+    suspensionExpiresAt.setDate(suspensionExpiresAt.getDate() + 28); // 28 days from now
+
+    // Update network to suspended status
+    await sql`
+      UPDATE networks 
+      SET 
+        suspension_status = 'temporarily_suspended',
+        suspended_at = CURRENT_TIMESTAMP,
+        suspended_by = ${userId},
+        suspension_token = ${suspensionToken},
+        suspension_expires_at = ${suspensionExpiresAt},
+        name = CASE 
+          WHEN name NOT LIKE '%(suspended)' THEN name || ' (suspended)'
+          ELSE name
+        END
+      WHERE id = ${networkId}
+    `;
+
+    // Clear caches
+    await cacheInvalidatePattern(`network:${networkId}:*`);
+    await cacheInvalidatePattern(`user:*:networks`);
+    await cacheInvalidatePattern(`recommendations:*:${networkId}`);
+
+    // Emit network suspension event
+    await emitNetworkEvent('network_suspended', networkId, {
+      suspendedBy: userId,
+      suspendedAt: new Date(),
+      suspensionToken,
+      suspensionExpiresAt
+    });
+
+    // Log network suspension
+    logger.info('Network suspended', {
+      networkId,
+      suspendedBy: userId,
+      networkName: network[0].name,
+      suspensionExpiresAt
+    });
+
+    res.json({ 
+      message: 'Network suspended successfully',
+      suspensionToken,
+      expiresAt: suspensionExpiresAt
+    });
+  } catch (error) {
+    logger.error('Error suspending network:', error);
+    res.status(500).json({ error: 'Failed to suspend network' });
+  }
+}
+
+export async function unsuspendNetwork(
+  req: AuthRequest,
+  res: Response
+) {
+  try {
+    const { networkId } = req.params;
+    const { suspensionToken } = req.body;
+    const userId = req.user!.id;
+
+    if (!isValidUUID(networkId)) {
+      return res.status(400).json({ error: 'Invalid network ID format' });
+    }
+
+    if (!suspensionToken) {
+      return res.status(400).json({ error: 'Suspension token is required' });
+    }
+
+    // Get network details
+    const network = await sql<Network[]>`
+      SELECT * FROM networks 
+      WHERE id = ${networkId} AND suspension_token = ${suspensionToken}
+    `;
+
+    if (network.length === 0) {
+      return res.status(404).json({ error: 'Network not found or invalid suspension token' });
+    }
+
+    // Check if network is actually suspended
+    if (network[0].suspension_status !== 'temporarily_suspended') {
+      return res.status(400).json({ error: 'Network is not suspended' });
+    }
+
+    // Check if suspension has expired
+    const now = new Date();
+    if (network[0].suspension_expires_at && new Date(network[0].suspension_expires_at) < now) {
+      return res.status(400).json({ error: 'Suspension period has expired. Network cannot be restored.' });
+    }
+
+    // Check if user has permission (original suspender or admin)
+    const member = await sql<NetworkMember[]>`
+      SELECT role FROM network_members 
+      WHERE network_id = ${networkId} AND user_id = ${userId}
+    `;
+
+    const canUnsuspend = network[0].suspended_by === userId || 
+                        (member.length > 0 && ['creator', 'admin'].includes(member[0].role));
+
+    if (!canUnsuspend) {
+      return res.status(403).json({ error: 'Only the original suspender or network admins can restore the network' });
+    }
+
+    // Remove suspension and restore original name
+    const originalName = network[0].name.replace(' (suspended)', '');
+    
+    await sql`
+      UPDATE networks 
+      SET 
+        suspension_status = 'active',
+        suspended_at = NULL,
+        suspended_by = NULL,
+        suspension_token = NULL,
+        suspension_expires_at = NULL,
+        name = ${originalName}
+      WHERE id = ${networkId}
+    `;
+
+    // Clear caches
+    await cacheInvalidatePattern(`network:${networkId}:*`);
+    await cacheInvalidatePattern(`user:*:networks`);
+    await cacheInvalidatePattern(`recommendations:*:${networkId}`);
+
+    // Emit network restoration event
+    await emitNetworkEvent('network_restored', networkId, {
+      restoredBy: userId,
+      restoredAt: new Date()
+    });
+
+    // Log network restoration
+    logger.info('Network restored', {
+      networkId,
+      restoredBy: userId,
+      networkName: originalName
+    });
+
+    res.json({ 
+      message: 'Network restored successfully',
+      networkName: originalName
+    });
+  } catch (error) {
+    logger.error('Error restoring network:', error);
+    res.status(500).json({ error: 'Failed to restore network' });
+  }
+}
+
+// Cleanup function for expired suspensions (called by scheduler)
+export async function cleanupExpiredSuspensions() {
+  try {
+    const now = new Date();
+    
+    // Find networks with expired suspensions
+    const expiredNetworks = await sql<Network[]>`
+      SELECT id, name, suspended_by
+      FROM networks 
+      WHERE suspension_status = 'temporarily_suspended'
+      AND suspension_expires_at < ${now}
+    `;
+
+    if (expiredNetworks.length === 0) {
+      logger.info('No expired network suspensions found');
+      return;
+    }
+
+    // Process each expired network
+    for (const network of expiredNetworks) {
+      try {
+        // Delete all network-related data
+        await sql.begin(async sql => {
+          // Delete connection requests
+          await sql`DELETE FROM connection_requests WHERE network_id = ${network.id}`;
+          
+          // Delete recommendations
+          await sql`DELETE FROM user_recommendations WHERE network_id = ${network.id}`;
+          
+          // Delete network goals and member selections
+          await sql`DELETE FROM network_member_goals WHERE network_id = ${network.id}`;
+          await sql`DELETE FROM network_goals WHERE network_id = ${network.id}`;
+          
+          // Delete pending join requests
+          await sql`DELETE FROM pending_network_joins WHERE network_id = ${network.id}`;
+          
+          // Delete invitations
+          await sql`DELETE FROM network_invitations WHERE network_id = ${network.id}`;
+          
+          // Delete network members
+          await sql`DELETE FROM network_members WHERE network_id = ${network.id}`;
+          
+          // Finally delete the network
+          await sql`DELETE FROM networks WHERE id = ${network.id}`;
+        });
+
+        // Clear caches
+        await cacheInvalidatePattern(`network:${network.id}:*`);
+        await cacheInvalidatePattern(`user:*:networks`);
+        await cacheInvalidatePattern(`recommendations:*:${network.id}`);
+
+        // Emit network deletion event
+        await emitNetworkEvent('network_permanently_deleted', network.id, {
+          reason: 'suspension_expired',
+          originalSuspendedBy: network.suspended_by,
+          deletedAt: new Date()
+        });
+
+        logger.info('Expired suspended network permanently deleted', {
+          networkId: network.id,
+          networkName: network.name,
+          originalSuspendedBy: network.suspended_by
+        });
+      } catch (error) {
+        logger.error('Error deleting expired suspended network', {
+          networkId: network.id,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        });
+      }
+    }
+
+    logger.info(`Processed ${expiredNetworks.length} expired network suspensions`);
+  } catch (error) {
+    logger.error('Error during expired suspension cleanup:', error);
+    throw error;
+  }
 }

@@ -2,6 +2,9 @@ import express, { Request, Response, NextFunction } from 'express'
 import http from 'http'
 import auth from './routes/auth'
 import networks from './routes/networks'
+import recommendations from './routes/recommendations'
+import connections from './routes/connections'
+import crossNetworks from './routes/crossNetworks'
 import bodyParser from 'body-parser'
 import process from 'process'
 import cors from 'cors'
@@ -74,6 +77,9 @@ app.get('/', (req: Request, res: Response) => {
 
 app.use('/V1/auth', auth)
 app.use('/V1/networks', networks)
+app.use('/V1/recommendations', recommendations)
+app.use('/V1/connections', connections)
+app.use('/V1/cross-networks', crossNetworks)
 
 // WebSocket test endpoints
 app.get('/V1/socket-docs', (req: Request, res: Response) => {

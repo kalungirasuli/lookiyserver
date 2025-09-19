@@ -20,7 +20,9 @@ import {
   deleteNetworkGoal,
   selectNetworkGoals,
   getNetworkMembers,
-  updateNetworkPasscode
+  updateNetworkPasscode,
+  suspendNetwork,
+  unsuspendNetwork
 } from '../controllers/networkController';
 import { avatarUpload } from '../utils/storage';
 
@@ -30,6 +32,8 @@ const router = Router();
 router.post('/', authenticate, createNetwork);
 router.put('/:id', authenticate, avatarUpload, editNetwork);
 router.put('/:id/passcode', authenticate, updateNetworkPasscode);
+router.post('/:id/suspend', authenticate, suspendNetwork);
+router.post('/:id/unsuspend', authenticate, unsuspendNetwork);
 
 // Network joining and invitations
 router.post('/:id/join', authenticate, joinNetwork);
