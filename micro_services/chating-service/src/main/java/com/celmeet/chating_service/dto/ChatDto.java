@@ -17,6 +17,6 @@ public class ChatDto {
     private MessageDto lastMessage;
     private Integer creatorUnViewedCount;
     private Integer otherUnViewedCount;
-    private Date createdAt;
+    private Date createdAt; 
 
 }
